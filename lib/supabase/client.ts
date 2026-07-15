@@ -1,0 +1,10 @@
+import { createBrowserClient } from "@supabase/ssr";
+
+// Cliente Supabase para uso em Client Components.
+// Agora com suporte a sessão (cookies), necessário para login/logout do painel.
+export function createSupabaseBrowserClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
