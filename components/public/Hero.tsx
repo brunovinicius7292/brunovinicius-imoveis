@@ -1,4 +1,4 @@
-import FormularioFiltros from "@/components/public/FormularioFiltros";
+import FiltrosSticky from "@/components/public/FiltrosSticky";
 import { OpcaoBairro, OpcaoLocalidade } from "@/lib/supabase/imoveis";
 
 export default function Hero({
@@ -23,17 +23,16 @@ export default function Hero({
         }}
       />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-        <p className="font-body text-sm font-medium uppercase tracking-[0.3em] text-gold-300">
-          Corretor especializado em Itabuna e região
-        </p>
-        <h1 className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-          Compre, venda ou alugue o imóvel ideal em Itabuna e região com
-          segurança e agilidade.
+      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
+        <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.15] text-white sm:text-5xl">
+          Compra, venda e aluguel de imóveis em Itabuna e região.
         </h1>
+        <p className="mt-4 font-body text-sm font-medium uppercase tracking-[0.3em] text-gold-300">
+          CRECI-BA 30.048
+        </p>
 
-        <div className="mt-10">
-          <FormularioFiltros
+        <div className="mt-10 sm:mt-12">
+          <FiltrosSticky
             categorias={categorias}
             cidades={cidades}
             bairros={bairros}

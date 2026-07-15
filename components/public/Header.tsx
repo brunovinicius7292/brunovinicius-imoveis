@@ -1,14 +1,25 @@
+import Image from "next/image";
+
 export default function Header() {
   return (
     <header className="bg-navy-800 text-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-2xl font-semibold tracking-tight">
-            Bruno Vinícius
-          </span>
-          <span className="font-body text-sm uppercase tracking-[0.2em] text-gold-300">
-            Imóveis
-          </span>
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        {/*
+          O arquivo original tem bastante espaço transparente ao redor da
+          marca (respiro do logotipo oficial). Em um espaço tão pequeno quanto
+          a navbar isso deixaria o "B|V" ilegível, então a imagem é ampliada e
+          recortada (sem alterar o arquivo original) para mostrar só a área
+          com conteúdo visível.
+        */}
+        <div className="relative aspect-[221/164] h-11 overflow-hidden sm:h-12">
+          <Image
+            src="/image.png"
+            alt="Bruno Vinícius Imóveis"
+            fill
+            priority
+            sizes="90px"
+            className="scale-[1.77] object-cover object-center"
+          />
         </div>
 
         <nav className="hidden items-center gap-8 font-body text-sm text-navy-100 sm:flex">

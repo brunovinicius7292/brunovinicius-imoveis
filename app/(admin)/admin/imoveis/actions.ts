@@ -2,16 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { Finalidade } from "@/lib/types/imovel";
 
 export interface ImovelFormDados {
   codigo: string;
   titulo: string;
   descricao: string;
-  finalidade: "venda" | "aluguel";
+  finalidade: Finalidade;
   tipo: string;
   cidade: string;
   bairro: string;
   preco: number;
+  precoAluguel: number | null;
   quartos: number;
   banheiros: number;
   vagas: number;
@@ -60,6 +62,7 @@ export async function criarImovel(
       cidade: dados.cidade,
       bairro: dados.bairro,
       preco: dados.preco,
+      preco_aluguel: dados.precoAluguel,
       quartos: dados.quartos,
       banheiros: dados.banheiros,
       vagas: dados.vagas,
@@ -97,6 +100,7 @@ export async function atualizarImovel(
       cidade: dados.cidade,
       bairro: dados.bairro,
       preco: dados.preco,
+      preco_aluguel: dados.precoAluguel,
       quartos: dados.quartos,
       banheiros: dados.banheiros,
       vagas: dados.vagas,

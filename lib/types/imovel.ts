@@ -3,7 +3,7 @@
 // Os dados vêm do Supabase — ver /lib/supabase/imoveis.ts (site público) e
 // /lib/supabase/imoveis-admin.ts (painel administrativo).
 
-export type Finalidade = "venda" | "aluguel";
+export type Finalidade = "venda" | "aluguel" | "venda_aluguel";
 export type StatusImovel = "disponivel" | "vendido" | "alugado";
 
 export interface Imovel {
@@ -13,7 +13,8 @@ export interface Imovel {
   descricao?: string;
   tipo: string; // casa, apartamento, terreno, sala comercial...
   finalidade: Finalidade;
-  preco: number;
+  preco: number; // valor de venda (finalidade "venda"/"venda_aluguel") ou valor do aluguel (finalidade "aluguel")
+  precoAluguel?: number; // valor do aluguel, usado apenas quando finalidade = "venda_aluguel"
   condominio?: number;
   iptu?: number;
   aceitaFinanciamento?: boolean;

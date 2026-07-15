@@ -34,9 +34,11 @@ function montarFiltros(
     cidade: paramTexto(searchParams.cidade),
     bairro: paramTexto(searchParams.bairro),
     categoria: paramTexto(searchParams.categoria),
+    finalidade: paramTexto(searchParams.finalidade),
     precoMax: paramNumero(searchParams.precoMax),
     quartosMin: paramNumero(searchParams.quartos),
     vagasMin: paramNumero(searchParams.vagas),
+    ordenarPor: paramTexto(searchParams.ordenar),
   };
 }
 
@@ -58,11 +60,15 @@ export default async function Home({
 
   // "Imóveis em destaque" é apenas uma vitrine: os mesmos imóveis também
   // aparecem normalmente em Aluguel/Venda — sem exclusão entre as seções.
+  // Imóveis "venda_aluguel" aparecem nas duas seções, pois atendem às duas
+  // finalidades ao mesmo tempo.
   const imoveisAluguel = imoveisPublicados.filter(
-    (imovel) => imovel.finalidade === "aluguel"
+    (imovel) =>
+      imovel.finalidade === "aluguel" || imovel.finalidade === "venda_aluguel"
   );
   const imoveisVenda = imoveisPublicados.filter(
-    (imovel) => imovel.finalidade === "venda"
+    (imovel) =>
+      imovel.finalidade === "venda" || imovel.finalidade === "venda_aluguel"
   );
 
   const totalEncontrados = imoveisPublicados.length;
@@ -90,11 +96,13 @@ export default async function Home({
             legenda="Para alugar"
             titulo="Imóveis para aluguel"
             imoveis={imoveisAluguel}
+            contexto="aluguel"
           />
           <SecaoImoveisAgrupados
             legenda="Para comprar"
             titulo="Imóveis para venda"
             imoveis={imoveisVenda}
+            contexto="venda"
           />
         </>
       )}

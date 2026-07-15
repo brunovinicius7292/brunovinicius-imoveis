@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Campo, classesInput } from "@/components/ui/CampoFormulario";
-import { Imovel } from "@/lib/types/imovel";
+import { Finalidade, Imovel } from "@/lib/types/imovel";
 import { ehLinkYoutubeValido } from "@/lib/utils/youtube";
 import {
   atualizarImovel,
@@ -23,13 +23,16 @@ export default function ImovelForm({
   const [codigo, setCodigo] = useState(imovel?.codigo ?? "");
   const [titulo, setTitulo] = useState(imovel?.titulo ?? "");
   const [descricao, setDescricao] = useState(imovel?.descricao ?? "");
-  const [finalidade, setFinalidade] = useState<"venda" | "aluguel">(
+  const [finalidade, setFinalidade] = useState<Finalidade>(
     imovel?.finalidade ?? "venda"
   );
   const [tipo, setTipo] = useState(imovel?.tipo ?? "");
   const [cidade, setCidade] = useState(imovel?.cidade ?? "");
   const [bairro, setBairro] = useState(imovel?.bairro ?? "");
   const [preco, setPreco] = useState(imovel?.preco?.toString() ?? "");
+  const [precoAluguel, setPrecoAluguel] = useState(
+    imovel?.precoAluguel?.toString() ?? ""
+  );
   const [quartos, setQuartos] = useState(imovel?.quartos?.toString() ?? "0");
   const [banheiros, setBanheiros] = useState(
     imovel?.banheiros?.toString() ?? "0"
@@ -69,6 +72,7 @@ export default function ImovelForm({
       cidade,
       bairro,
       preco: Number(preco) || 0,
+      precoAluguel: finalidade === "venda_aluguel" ? Number(precoAluguel) || 0 : null,
       quartos: Number(quartos) || 0,
       banheiros: Number(banheiros) || 0,
       vagas: Number(vagas) || 0,
@@ -142,13 +146,12 @@ export default function ImovelForm({
           <Campo label="Finalidade" obrigatorio>
             <select
               value={finalidade}
-              onChange={(e) =>
-                setFinalidade(e.target.value as "venda" | "aluguel")
-              }
+              onChange={(e) => setFinalidade(e.target.value as Finalidade)}
               className={classesInput}
             >
               <option value="venda">Venda</option>
               <option value="aluguel">Aluguel</option>
+              <option value="venda_aluguel">Venda e Aluguel</option>
             </select>
           </Campo>
           <Campo label="Categoria" obrigatorio>
@@ -192,17 +195,45 @@ export default function ImovelForm({
           Valores
         </h2>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Campo label="Preço (R$)" obrigatorio>
-            <input
-              required
-              type="number"
-              min={0}
-              step="0.01"
-              value={preco}
-              onChange={(e) => setPreco(e.target.value)}
-              className={classesInput}
-            />
-          </Campo>
+          {(finalidade === "venda" || finalidade === "venda_aluguel") && (
+            <Campo label="Valor de Venda (R$)" obrigatorio>
+              <input
+                required
+                type="number"
+                min={0}
+                step="0.01"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
+                className={classesInput}
+              />
+            </Campo>
+          )}
+          {finalidade === "aluguel" && (
+            <Campo label="Valor do Aluguel (R$)" obrigatorio>
+              <input
+                required
+                type="number"
+                min={0}
+                step="0.01"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
+                className={classesInput}
+              />
+            </Campo>
+          )}
+          {finalidade === "venda_aluguel" && (
+            <Campo label="Valor do Aluguel (R$)" obrigatorio>
+              <input
+                required
+                type="number"
+                min={0}
+                step="0.01"
+                value={precoAluguel}
+                onChange={(e) => setPrecoAluguel(e.target.value)}
+                className={classesInput}
+              />
+            </Campo>
+          )}
         </div>
       </section>
 

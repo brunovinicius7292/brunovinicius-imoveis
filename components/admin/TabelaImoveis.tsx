@@ -5,13 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Imovel } from "@/lib/types/imovel";
 import { excluirImovel } from "@/app/(admin)/admin/imoveis/actions";
+import { formatarMoeda, ROTULOS_FINALIDADE } from "@/lib/utils/preco";
 
-function formatarPreco(imovel: Imovel) {
-  return imovel.preco.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0,
-  });
+const CLASSES_FINALIDADE: Record<string, string> = {
+  venda: "bg-green-100 text-green-700",
+  aluguel: "bg-blue-100 text-blue-700",
+  venda_aluguel: "bg-purple-100 text-purple-700",
+};
+
+function formatarValor(imovel: Imovel) {
+  if (imovel.finalidade === "venda_aluguel") {
+    return `Venda: ${formatarMoeda(imovel.preco)} · Aluguel: ${formatarMoeda(
+      imovel.precoAluguel ?? 0
+    )}`;
+  }
+  return formatarMoeda(imovel.preco);
 }
 
 export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
@@ -88,14 +96,21 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
               <td className="px-4 py-3 font-medium text-navy-900">
                 {imovel.titulo}
               </td>
-              <td className="px-4 py-3 text-navy-600">
-                {imovel.finalidade === "venda" ? "Venda" : "Aluguel"}
+              <td className="px-4 py-3">
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    CLASSES_FINALIDADE[imovel.finalidade] ??
+                    "bg-navy-50 text-navy-600"
+                  }`}
+                >
+                  {ROTULOS_FINALIDADE[imovel.finalidade] ?? imovel.finalidade}
+                </span>
               </td>
               <td className="px-4 py-3 text-navy-600">{imovel.tipo}</td>
               <td className="px-4 py-3 text-navy-600">{imovel.cidade}</td>
               <td className="px-4 py-3 text-navy-600">{imovel.bairro}</td>
               <td className="px-4 py-3 text-navy-600">
-                {formatarPreco(imovel)}
+                {formatarValor(imovel)}
               </td>
               <td className="px-4 py-3">
                 <span

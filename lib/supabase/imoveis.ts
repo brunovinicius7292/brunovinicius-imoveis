@@ -7,11 +7,13 @@ export interface FiltrosImoveis {
   cidade?: string;
   bairro?: string;
   categoria?: string;
+  finalidade?: string;
   precoMin?: number;
   precoMax?: number;
   quartosMin?: number;
   banheirosMin?: number;
   vagasMin?: number;
+  ordenarPor?: string;
 }
 
 // Aplica, de forma incremental, apenas os filtros que vieram preenchidos —
@@ -31,6 +33,13 @@ function aplicarFiltros(query: any, filtros?: FiltrosImoveis) {
   if (filtros.categoria) {
     resultado = resultado.eq("tipo", filtros.categoria);
   }
+  // "venda"/"aluguel" também deve trazer imóveis "venda_aluguel", já que estes
+  // atendem às duas finalidades ao mesmo tempo.
+  if (filtros.finalidade === "venda" || filtros.finalidade === "aluguel") {
+    resultado = resultado.in("finalidade", [filtros.finalidade, "venda_aluguel"]);
+  } else if (filtros.finalidade) {
+    resultado = resultado.eq("finalidade", filtros.finalidade);
+  }
   if (filtros.precoMin != null) {
     resultado = resultado.gte("preco", filtros.precoMin);
   }
@@ -48,6 +57,22 @@ function aplicarFiltros(query: any, filtros?: FiltrosImoveis) {
   }
 
   return resultado;
+}
+
+// Define a ordenação da busca — usada igualmente pelos Destaques e pela
+// busca geral (que alimenta as seções de Venda e Aluguel), para que os três
+// respeitem a mesma opção escolhida em "Ordenar por".
+function aplicarOrdenacao(query: any, ordenarPor?: string) {
+  switch (ordenarPor) {
+    case "menor-preco":
+      return query.order("preco", { ascending: true });
+    case "maior-preco":
+      return query.order("preco", { ascending: false });
+    case "maior-area":
+      return query.order("area_m2", { ascending: false });
+    default:
+      return query.order("criado_em", { ascending: false });
+  }
 }
 
 // Converte o caminho salvo no banco (Storage) na URL pública do arquivo.
@@ -72,6 +97,7 @@ function mapRowParaImovel(row: any, supabase: ClienteSupabase): Imovel {
     tipo: row.tipo,
     finalidade: row.finalidade,
     preco: Number(row.preco),
+    precoAluguel: row.preco_aluguel != null ? Number(row.preco_aluguel) : undefined,
     condominio: row.condominio != null ? Number(row.condominio) : undefined,
     iptu: row.iptu != null ? Number(row.iptu) : undefined,
     aceitaFinanciamento: row.aceita_financiamento,
@@ -107,16 +133,14 @@ export async function getImoveisDestaque(
 
   query = aplicarFiltros(query, filtros);
 
-  const { data, error } = await query.order("criado_em", {
-    ascending: false,
-  });
+  const { data, error } = await aplicarOrdenacao(query, filtros?.ordenarPor);
 
   if (error) {
     console.error("Erro ao buscar imóveis em destaque:", error.message);
     return [];
   }
 
-  return (data ?? []).map((row) => mapRowParaImovel(row, supabase));
+  return (data ?? []).map((row: any) => mapRowParaImovel(row, supabase));
 }
 
 // Todos os imóveis publicados e disponíveis (sem filtrar por destaque),
@@ -134,16 +158,14 @@ export async function getImoveisPublicados(
 
   query = aplicarFiltros(query, filtros);
 
-  const { data, error } = await query.order("criado_em", {
-    ascending: false,
-  });
+  const { data, error } = await aplicarOrdenacao(query, filtros?.ordenarPor);
 
   if (error) {
     console.error("Erro ao buscar imóveis publicados:", error.message);
     return [];
   }
 
-  return (data ?? []).map((row) => mapRowParaImovel(row, supabase));
+  return (data ?? []).map((row: any) => mapRowParaImovel(row, supabase));
 }
 
 // Categorias (tipo) realmente em uso entre os imóveis publicados —

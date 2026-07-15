@@ -2,15 +2,18 @@ import Link from "next/link";
 import { Imovel } from "@/lib/types/imovel";
 import { obterThumbnailYoutube } from "@/lib/utils/youtube";
 import ImagemImovel from "@/components/public/ImagemImovel";
+import { formatarMoeda } from "@/lib/utils/preco";
 
 function formatarPreco(imovel: Imovel) {
-  const valor = imovel.preco.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0,
-  });
+  const valor = formatarMoeda(imovel.preco);
   return imovel.finalidade === "aluguel" ? `${valor}/mês` : valor;
 }
+
+const BADGES_FINALIDADE: Record<string, string> = {
+  venda: "🟢 Venda",
+  aluguel: "🔵 Aluguel",
+  venda_aluguel: "🟣 Venda e Aluguel",
+};
 
 // Imagem de exemplo temporária (fallback), usada só enquanto o imóvel ainda
 // não tem nenhuma foto real enviada pelo painel administrativo.
@@ -54,7 +57,16 @@ function IconeArea() {
   );
 }
 
-export default function ImovelCard({ imovel }: { imovel: Imovel }) {
+export default function ImovelCard({
+  imovel,
+  contexto,
+}: {
+  imovel: Imovel;
+  // Em qual seção o card está sendo exibido ("venda" ou "aluguel"). Só
+  // importa para imóveis "venda_aluguel": define qual dos dois valores
+  // mostrar. Sem contexto (ex.: destaques), mostra os dois valores.
+  contexto?: "venda" | "aluguel";
+}) {
   const temFotoReal = Boolean(imovel.fotoCapaUrl);
   const thumbnailVideo = temFotoReal
     ? null
@@ -78,11 +90,11 @@ export default function ImovelCard({ imovel }: { imovel: Imovel }) {
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-900/40 via-transparent to-transparent" />
         <span className="absolute left-3 top-3 rounded-full bg-navy-900/90 px-3 py-1 font-body text-xs font-medium uppercase tracking-wide text-gold-300 shadow-sm">
-          {imovel.finalidade === "venda" ? "Venda" : "Aluguel"}
+          {BADGES_FINALIDADE[imovel.finalidade] ?? imovel.finalidade}
         </span>
         {usandoThumbnailVideo && (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-navy-900/75 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-white shadow-sm backdrop-blur-sm">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-2.5 w-2.5 text-gold-300">
+          <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-navy-900/80 px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-gold-200 shadow-md ring-1 ring-white/10 backdrop-blur-sm">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
               <path d="M8 5v14l11-7Z" />
             </svg>
             Vídeo
@@ -91,9 +103,28 @@ export default function ImovelCard({ imovel }: { imovel: Imovel }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <p className="font-display text-2xl font-semibold text-gold-600">
-          {formatarPreco(imovel)}
-        </p>
+        {imovel.finalidade === "venda_aluguel" && contexto === "venda" ? (
+          <p className="font-display text-2xl font-semibold text-gold-600">
+            {formatarMoeda(imovel.preco)}
+          </p>
+        ) : imovel.finalidade === "venda_aluguel" && contexto === "aluguel" ? (
+          <p className="font-display text-2xl font-semibold text-gold-600">
+            {formatarMoeda(imovel.precoAluguel ?? 0)}/mês
+          </p>
+        ) : imovel.finalidade === "venda_aluguel" ? (
+          <div className="flex flex-col gap-0.5">
+            <p className="font-display text-xl font-semibold text-gold-600">
+              Venda: {formatarMoeda(imovel.preco)}
+            </p>
+            <p className="font-body text-sm font-semibold text-navy-500">
+              Aluguel: {formatarMoeda(imovel.precoAluguel ?? 0)}/mês
+            </p>
+          </div>
+        ) : (
+          <p className="font-display text-2xl font-semibold text-gold-600">
+            {formatarPreco(imovel)}
+          </p>
+        )}
 
         <div>
           <h3 className="font-body text-base font-semibold text-navy-800">

@@ -6,23 +6,43 @@ import { OpcaoBairro, OpcaoLocalidade } from "@/lib/supabase/imoveis";
 
 // Mesma altura, padding e tipografia em todos os campos (selects e inputs),
 // para o alinhamento ficar perfeito independentemente do tipo de campo.
-const classesCampo =
-  "h-11 w-full rounded-lg border border-navy-200 bg-white px-3 font-body text-sm text-navy-800 transition focus:border-gold-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-navy-50 disabled:text-navy-300";
+// Em modo compacto (barra fixa no topo ao rolar) a altura reduz, mas o
+// campo continua com o mesmo comportamento.
+const classesCampoBase =
+  "w-full rounded-lg border border-navy-200 bg-white px-3 font-body text-sm text-navy-800 transition focus:border-gold-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-navy-50 disabled:text-navy-300";
 
 const OPCOES_QUARTOS = ["1", "2", "3", "4", "5"];
 const OPCOES_VAGAS = ["1", "2", "3", "4"];
+
+// Valor "" representa "Ambos" — mesma convenção usada pelos demais filtros
+// (ausência de valor = sem restrição na busca).
+const OPCOES_FINALIDADE: { label: string; value: string }[] = [
+  { label: "Ambos", value: "" },
+  { label: "Venda", value: "venda" },
+  { label: "Aluguel", value: "aluguel" },
+  { label: "Venda e Aluguel", value: "venda_aluguel" },
+];
 
 function capitalizar(texto: string) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+const OPCOES_ORDENACAO = [
+  { label: "Mais recentes", value: "" },
+  { label: "Menor preço", value: "menor-preco" },
+  { label: "Maior preço", value: "maior-preco" },
+  { label: "Maior área", value: "maior-area" },
+];
+
 interface FiltrosForm {
   cidade: string;
   bairro: string;
   categoria: string;
+  finalidade: string;
   precoMax: string;
   quartos: string;
   vagas: string;
+  ordenar: string;
 }
 
 function lerFiltrosDaUrl(searchParams: URLSearchParams): FiltrosForm {
@@ -30,9 +50,11 @@ function lerFiltrosDaUrl(searchParams: URLSearchParams): FiltrosForm {
     cidade: searchParams.get("cidade") ?? "",
     bairro: searchParams.get("bairro") ?? "",
     categoria: searchParams.get("categoria") ?? "",
+    finalidade: searchParams.get("finalidade") ?? "",
     precoMax: searchParams.get("precoMax") ?? "",
     quartos: searchParams.get("quartos") ?? "",
     vagas: searchParams.get("vagas") ?? "",
+    ordenar: searchParams.get("ordenar") ?? "",
   };
 }
 
@@ -40,10 +62,12 @@ export default function FormularioFiltros({
   categorias,
   cidades,
   bairros,
+  compacto = false,
 }: {
   categorias: string[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
+  compacto?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -90,6 +114,8 @@ export default function FormularioFiltros({
     router.push(queryString ? `/?${queryString}` : "/");
   }
 
+  const classesCampo = `${classesCampoBase} ${compacto ? "h-9" : "h-11"}`;
+
   function classesSelect(valor: string) {
     return `${classesCampo} ${valor ? "text-navy-800" : "text-navy-400"}`;
   }
@@ -97,9 +123,44 @@ export default function FormularioFiltros({
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full rounded-2xl bg-white p-5 shadow-lg shadow-navy-900/10 sm:p-6"
+      className={
+        compacto
+          ? "w-full py-3"
+          : "w-full rounded-2xl bg-white p-5 shadow-lg shadow-navy-900/10 sm:p-6"
+      }
     >
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div
+        role="tablist"
+        aria-label="Finalidade do imóvel"
+        className={`inline-flex rounded-xl bg-navy-50 p-1 ${
+          compacto ? "mb-2" : "mb-4"
+        }`}
+      >
+        {OPCOES_FINALIDADE.map((opcao) => (
+          <button
+            key={opcao.value || "ambos"}
+            type="button"
+            role="tab"
+            aria-selected={filtros.finalidade === opcao.value}
+            onClick={() => atualizarCampo("finalidade", opcao.value)}
+            className={`rounded-lg font-body text-sm font-semibold transition ${
+              compacto ? "px-4 py-1.5" : "px-5 py-2"
+            } ${
+              filtros.finalidade === opcao.value
+                ? "bg-navy-800 text-white"
+                : "text-navy-500 hover:text-navy-800"
+            }`}
+          >
+            {opcao.label}
+          </button>
+        ))}
+      </div>
+
+      <div
+        className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${
+          compacto ? "gap-2" : "gap-3"
+        }`}
+      >
         <select
           aria-label="Cidade"
           value={filtros.cidade}
@@ -168,7 +229,7 @@ export default function FormularioFiltros({
           onChange={(e) => atualizarCampo("quartos", e.target.value)}
           className={classesSelect(filtros.quartos)}
         >
-          <option value="">Qualquer quantidade</option>
+          <option value="">Qualquer quantidade de quartos</option>
           {OPCOES_QUARTOS.map((quantidade) => (
             <option key={quantidade} value={quantidade}>
               {quantidade}+
@@ -182,19 +243,34 @@ export default function FormularioFiltros({
           onChange={(e) => atualizarCampo("vagas", e.target.value)}
           className={classesSelect(filtros.vagas)}
         >
-          <option value="">Qualquer quantidade</option>
+          <option value="">Qualquer quantidade de vagas</option>
           {OPCOES_VAGAS.map((quantidade) => (
             <option key={quantidade} value={quantidade}>
               {quantidade}+
             </option>
           ))}
         </select>
+
+        <select
+          aria-label="Ordenar por"
+          value={filtros.ordenar}
+          onChange={(e) => atualizarCampo("ordenar", e.target.value)}
+          className={classesSelect(filtros.ordenar)}
+        >
+          {OPCOES_ORDENACAO.map((opcao) => (
+            <option key={opcao.value || "recentes"} value={opcao.value}>
+              {opcao.value ? opcao.label : `Ordenar por: ${opcao.label}`}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="mt-5 flex justify-end">
+      <div className={`flex justify-end ${compacto ? "mt-3" : "mt-5"}`}>
         <button
           type="submit"
-          className="rounded-xl bg-navy-800 px-6 py-2.5 font-body text-sm font-semibold text-white transition hover:bg-navy-700"
+          className={`rounded-xl bg-navy-800 font-body text-sm font-semibold text-white transition hover:bg-navy-700 ${
+            compacto ? "px-5 py-2" : "px-6 py-2.5"
+          }`}
         >
           Buscar
         </button>

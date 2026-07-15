@@ -7,16 +7,15 @@ import BotaoWhatsApp from "@/components/public/BotaoWhatsApp";
 import BotaoCompartilhar from "@/components/public/BotaoCompartilhar";
 import BotaoVoltar from "@/components/public/BotaoVoltar";
 import { getImovelPorSlug, getFotosDoImovel } from "@/lib/supabase/imoveis";
-import { obterUrlEmbedYoutube } from "@/lib/utils/youtube";
+import { obterUrlEmbedYoutube, obterThumbnailYoutube } from "@/lib/utils/youtube";
 import DescricaoImovel from "@/components/public/DescricaoImovel";
+import ImagemImovel from "@/components/public/ImagemImovel";
+import BotaoAssistirVideo from "@/components/public/BotaoAssistirVideo";
 import { Imovel } from "@/lib/types/imovel";
+import { formatarMoeda, ROTULOS_FINALIDADE } from "@/lib/utils/preco";
 
 function formatarPreco(imovel: Imovel) {
-  const valor = imovel.preco.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0,
-  });
+  const valor = formatarMoeda(imovel.preco);
   return imovel.finalidade === "aluguel" ? `${valor}/mês` : valor;
 }
 
@@ -33,6 +32,11 @@ export default async function PaginaImovel({
 
   const fotos = await getFotosDoImovel(imovel.id);
   const urlEmbedVideo = obterUrlEmbedYoutube(imovel.videoYoutubeUrl);
+  const thumbnailVideo = obterThumbnailYoutube(imovel.videoYoutubeUrl);
+  const thumbnailVideoFallback = obterThumbnailYoutube(
+    imovel.videoYoutubeUrl,
+    "hqdefault"
+  );
 
   return (
     <main className="min-h-screen bg-neutral-50">
@@ -44,14 +48,17 @@ export default async function PaginaImovel({
         <div className="mt-4">
           {fotos.length > 0 ? (
             <Galeria titulo={imovel.titulo} fotos={fotos} />
-          ) : urlEmbedVideo ? (
-            <div className="h-72 w-full overflow-hidden rounded-2xl sm:h-96">
-              <iframe
-                src={urlEmbedVideo}
-                title={`Vídeo do imóvel ${imovel.titulo}`}
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+          ) : thumbnailVideo ? (
+            <div className="relative h-72 w-full overflow-hidden rounded-2xl sm:h-96">
+              <ImagemImovel
+                src={thumbnailVideo}
+                srcFallback={thumbnailVideoFallback}
+                alt={`Vídeo do imóvel ${imovel.titulo}`}
+                className="h-full w-full object-cover"
+              />
+              <BotaoAssistirVideo
+                urlEmbed={urlEmbedVideo ?? ""}
+                titulo={imovel.titulo}
               />
             </div>
           ) : (
@@ -62,7 +69,7 @@ export default async function PaginaImovel({
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <span className="inline-block rounded-full bg-navy-900 px-3 py-1 font-body text-xs font-medium uppercase tracking-wide text-gold-300">
-              {imovel.finalidade === "venda" ? "Venda" : "Aluguel"}
+              {ROTULOS_FINALIDADE[imovel.finalidade] ?? imovel.finalidade}
             </span>
 
             <h1 className="mt-3 font-display text-3xl font-semibold text-navy-900 sm:text-4xl">
@@ -128,9 +135,30 @@ export default async function PaginaImovel({
           </div>
 
           <aside className="h-fit rounded-2xl bg-white p-5 shadow-sm ring-1 ring-navy-900/5 lg:sticky lg:top-6">
-            <p className="font-display text-3xl font-semibold text-gold-600">
-              {formatarPreco(imovel)}
-            </p>
+            {imovel.finalidade === "venda_aluguel" ? (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="font-body text-xs font-semibold uppercase tracking-wide text-navy-400">
+                    Venda
+                  </p>
+                  <p className="font-display text-2xl font-semibold text-gold-600">
+                    {formatarMoeda(imovel.preco)}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-body text-xs font-semibold uppercase tracking-wide text-navy-400">
+                    Aluguel
+                  </p>
+                  <p className="font-display text-2xl font-semibold text-gold-600">
+                    {formatarMoeda(imovel.precoAluguel ?? 0)}/mês
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="font-display text-3xl font-semibold text-gold-600">
+                {formatarPreco(imovel)}
+              </p>
+            )}
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
               <BotaoWhatsApp titulo={imovel.titulo} />
