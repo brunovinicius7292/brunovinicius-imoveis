@@ -1,6 +1,3 @@
 {
-  "/(public)/page": "app/(public)/page.js",
-  "/(admin)/admin/imoveis/[id]/editar/page": "app/(admin)/admin/imoveis/[id]/editar/page.js",
-  "/(admin)/admin/imoveis/page": "app/(admin)/admin/imoveis/page.js",
-  "/(admin)/admin/imoveis/novo/page": "app/(admin)/admin/imoveis/novo/page.js"
+  "/(public)/page": "app/(public)/page.js"
 }

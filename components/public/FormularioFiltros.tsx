@@ -6,8 +6,6 @@ import { OpcaoBairro, OpcaoLocalidade } from "@/lib/supabase/imoveis";
 
 // Mesma altura, padding e tipografia em todos os campos (selects e inputs),
 // para o alinhamento ficar perfeito independentemente do tipo de campo.
-// Em modo compacto (barra fixa no topo ao rolar) a altura reduz, mas o
-// campo continua com o mesmo comportamento.
 const classesCampoBase =
   "w-full rounded-lg border border-navy-200 bg-white px-3 font-body text-sm text-navy-800 transition focus:border-gold-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-navy-50 disabled:text-navy-300";
 
@@ -62,12 +60,10 @@ export default function FormularioFiltros({
   categorias,
   cidades,
   bairros,
-  compacto = false,
 }: {
   categorias: string[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
-  compacto?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -114,7 +110,7 @@ export default function FormularioFiltros({
     router.push(queryString ? `/?${queryString}` : "/");
   }
 
-  const classesCampo = `${classesCampoBase} ${compacto ? "h-9" : "h-11"}`;
+  const classesCampo = `${classesCampoBase} h-11`;
 
   function classesSelect(valor: string) {
     return `${classesCampo} ${valor ? "text-navy-800" : "text-navy-400"}`;
@@ -123,18 +119,12 @@ export default function FormularioFiltros({
   return (
     <form
       onSubmit={handleSubmit}
-      className={
-        compacto
-          ? "w-full py-3"
-          : "w-full rounded-2xl bg-white p-5 shadow-lg shadow-navy-900/10 sm:p-6"
-      }
+      className="w-full rounded-2xl bg-white p-5 shadow-lg shadow-navy-900/10 sm:p-6"
     >
       <div
         role="tablist"
         aria-label="Finalidade do imóvel"
-        className={`inline-flex rounded-xl bg-navy-50 p-1 ${
-          compacto ? "mb-2" : "mb-4"
-        }`}
+        className="mb-4 inline-flex rounded-xl bg-navy-50 p-1"
       >
         {OPCOES_FINALIDADE.map((opcao) => (
           <button
@@ -143,9 +133,7 @@ export default function FormularioFiltros({
             role="tab"
             aria-selected={filtros.finalidade === opcao.value}
             onClick={() => atualizarCampo("finalidade", opcao.value)}
-            className={`rounded-lg font-body text-sm font-semibold transition ${
-              compacto ? "px-4 py-1.5" : "px-5 py-2"
-            } ${
+            className={`rounded-lg px-5 py-2 font-body text-sm font-semibold transition ${
               filtros.finalidade === opcao.value
                 ? "bg-navy-800 text-white"
                 : "text-navy-500 hover:text-navy-800"
@@ -156,11 +144,7 @@ export default function FormularioFiltros({
         ))}
       </div>
 
-      <div
-        className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${
-          compacto ? "gap-2" : "gap-3"
-        }`}
-      >
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <select
           aria-label="Cidade"
           value={filtros.cidade}
@@ -265,12 +249,10 @@ export default function FormularioFiltros({
         </select>
       </div>
 
-      <div className={`flex justify-end ${compacto ? "mt-3" : "mt-5"}`}>
+      <div className="mt-5 flex justify-end">
         <button
           type="submit"
-          className={`rounded-xl bg-navy-800 font-body text-sm font-semibold text-white transition hover:bg-navy-700 ${
-            compacto ? "px-5 py-2" : "px-6 py-2.5"
-          }`}
+          className="rounded-xl bg-navy-800 px-6 py-2.5 font-body text-sm font-semibold text-white transition hover:bg-navy-700"
         >
           Buscar
         </button>

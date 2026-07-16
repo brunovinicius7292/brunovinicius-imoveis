@@ -1,0 +1,200 @@
+warning: in the working copy of '.next/app-build-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/build-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/middleware-build-manifest.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/middleware-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/server-reference-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/trace', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/public/FormularioFiltros.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/public/Hero.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/.next/app-build-manifest.json b/.next/app-build-manifest.json[m
+[1mindex c6135c4..1b3b57d 100644[m
+[1m--- a/.next/app-build-manifest.json[m
+[1m+++ b/.next/app-build-manifest.json[m
+[36m@@ -1,35 +1,3 @@[m
+ {[m
+[31m-  "pages": {[m
+[31m-    "/(public)/page": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/chunks/app/(public)/page.js"[m
+[31m-    ],[m
+[31m-    "/layout": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/css/app/layout.css",[m
+[31m-      "static/chunks/app/layout.js"[m
+[31m-    ],[m
+[31m-    "/(admin)/admin/imoveis/novo/page": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/chunks/app/(admin)/admin/imoveis/novo/page.js"[m
+[31m-    ],[m
+[31m-    "/(admin)/admin/layout": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/chunks/app/(admin)/admin/layout.js"[m
+[31m-    ],[m
+[31m-    "/(admin)/admin/imoveis/[id]/editar/page": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/chunks/app/(admin)/admin/imoveis/[id]/editar/page.js"[m
+[31m-    ],[m
+[31m-    "/(admin)/admin/imoveis/page": [[m
+[31m-      "static/chunks/webpack.js",[m
+[31m-      "static/chunks/main-app.js",[m
+[31m-      "static/chunks/app/(admin)/admin/imoveis/page.js"[m
+[31m-    ][m
+[31m-  }[m
+[32m+[m[32m  "pages": {}[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/.next/build-manifest.json b/.next/build-manifest.json[m
+[1mindex 018cb67..b8b66ce 100644[m
+[1m--- a/.next/build-manifest.json[m
+[1m+++ b/.next/build-manifest.json[m
+[36m@@ -8,10 +8,7 @@[m
+     "static/development/_buildManifest.js",[m
+     "static/development/_ssgManifest.js"[m
+   ],[m
+[31m-  "rootMainFiles": [[m
+[31m-    "static/chunks/webpack.js",[m
+[31m-    "static/chunks/main-app.js"[m
+[31m-  ],[m
+[32m+[m[32m  "rootMainFiles": [],[m
+   "pages": {[m
+     "/_app": [][m
+   },[m
+[1mdiff --git a/.next/cache/images/2+99nPlnzsLqF0qpqvnXr+iPtfS79meB5zGA0xo0b0o=/60.1784144879413.3tfFqJ5uTrI24Jyxl6gA8w2tyw6BDOm3gun9s3pe1U0=.webp b/.next/cache/images/2+99nPlnzsLqF0qpqvnXr+iPtfS79meB5zGA0xo0b0o=/60.1784144879413.3tfFqJ5uTrI24Jyxl6gA8w2tyw6BDOm3gun9s3pe1U0=.webp[m
+[1mdeleted file mode 100644[m
+[1mindex 27c3dd4..0000000[m
+Binary files a/.next/cache/images/2+99nPlnzsLqF0qpqvnXr+iPtfS79meB5zGA0xo0b0o=/60.1784144879413.3tfFqJ5uTrI24Jyxl6gA8w2tyw6BDOm3gun9s3pe1U0=.webp and /dev/null differ
+[1mdiff --git a/.next/cache/webpack/client-development/1.pack.gz b/.next/cache/webpack/client-development/1.pack.gz[m
+[1mindex 1a5aa28..f6c1470 100644[m
+Binary files a/.next/cache/webpack/client-development/1.pack.gz and b/.next/cache/webpack/client-development/1.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/12.pack.gz b/.next/cache/webpack/client-development/12.pack.gz[m
+[1mindex 9e5b6a8..44ad0f9 100644[m
+Binary files a/.next/cache/webpack/client-development/12.pack.gz and b/.next/cache/webpack/client-development/12.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/13.pack.gz b/.next/cache/webpack/client-development/13.pack.gz[m
+[1mindex 8d61e6c..5cd5272 100644[m
+Binary files a/.next/cache/webpack/client-development/13.pack.gz and b/.next/cache/webpack/client-development/13.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/2.pack.gz b/.next/cache/webpack/client-development/2.pack.gz[m
+[1mindex f0eac43..276f195 100644[m
+Binary files a/.next/cache/webpack/client-development/2.pack.gz and b/.next/cache/webpack/client-development/2.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/5.pack.gz b/.next/cache/webpack/client-development/5.pack.gz[m
+[1mindex d8368b3..3f1f074 100644[m
+Binary files a/.next/cache/webpack/client-development/5.pack.gz and b/.next/cache/webpack/client-development/5.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/8.pack.gz b/.next/cache/webpack/client-development/8.pack.gz[m
+[1mindex a3d0b18..7c0c613 100644[m
+Binary files a/.next/cache/webpack/client-development/8.pack.gz and b/.next/cache/webpack/client-development/8.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/index.pack.gz b/.next/cache/webpack/client-development/index.pack.gz[m
+[1mindex 36d48f2..343fc01 100644[m
+Binary files a/.next/cache/webpack/client-development/index.pack.gz and b/.next/cache/webpack/client-development/index.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/client-development/index.pack.gz.old b/.next/cache/webpack/client-development/index.pack.gz.old[m
+[1mindex d336245..061ce93 100644[m
+Binary files a/.next/cache/webpack/client-development/index.pack.gz.old and b/.next/cache/webpack/client-development/index.pack.gz.old differ
+[1mdiff --git a/.next/cache/webpack/server-development/0.pack.gz b/.next/cache/webpack/server-development/0.pack.gz[m
+[1mindex 8cb781c..5413165 100644[m
+Binary files a/.next/cache/webpack/server-development/0.pack.gz and b/.next/cache/webpack/server-development/0.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/1.pack.gz b/.next/cache/webpack/server-development/1.pack.gz[m
+[1mindex 3010485..0bd6700 100644[m
+Binary files a/.next/cache/webpack/server-development/1.pack.gz and b/.next/cache/webpack/server-development/1.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/10.pack.gz b/.next/cache/webpack/server-development/10.pack.gz[m
+[1mindex afc6f10..a65da19 100644[m
+Binary files a/.next/cache/webpack/server-development/10.pack.gz and b/.next/cache/webpack/server-development/10.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/2.pack.gz b/.next/cache/webpack/server-development/2.pack.gz[m
+[1mindex 7e66dd8..d9f7685 100644[m
+Binary files a/.next/cache/webpack/server-development/2.pack.gz and b/.next/cache/webpack/server-development/2.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/4.pack.gz b/.next/cache/webpack/server-development/4.pack.gz[m
+[1mindex 10dc86b..50f3d51 100644[m
+Binary files a/.next/cache/webpack/server-development/4.pack.gz and b/.next/cache/webpack/server-development/4.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/6.pack.gz b/.next/cache/webpack/server-development/6.pack.gz[m
+[1mindex ecc0ad9..4527773 100644[m
+Binary files a/.next/cache/webpack/server-development/6.pack.gz and b/.next/cache/webpack/server-development/6.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/9.pack.gz b/.next/cache/webpack/server-development/9.pack.gz[m
+[1mindex 3e4c6fb..772cf97 100644[m
+Binary files a/.next/cache/webpack/server-development/9.pack.gz and b/.next/cache/webpack/server-development/9.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/index.pack.gz b/.next/cache/webpack/server-development/index.pack.gz[m
+[1mindex 1fe3786..3789714 100644[m
+Binary files a/.next/cache/webpack/server-development/index.pack.gz and b/.next/cache/webpack/server-development/index.pack.gz differ
+[1mdiff --git a/.next/cache/webpack/server-development/index.pack.gz.old b/.next/cache/webpack/server-development/index.pack.gz.old[m
+[1mindex 9a8bf71..981a716 100644[m
+Binary files a/.next/cache/webpack/server-development/index.pack.gz.old and b/.next/cache/webpack/server-development/index.pack.gz.old differ
+[1mdiff --git a/.next/server/app-paths-manifest.json b/.next/server/app-paths-manifest.json[m
+[1mindex a9549c7..9e26dfe 100644[m
+[1m--- a/.next/server/app-paths-manifest.json[m
+[1m+++ b/.next/server/app-paths-manifest.json[m
+[36m@@ -1,6 +1 @@[m
+[31m-{[m
+[31m-  "/(public)/page": "app/(public)/page.js",[m
+[31m-  "/(admin)/admin/imoveis/[id]/editar/page": "app/(admin)/admin/imoveis/[id]/editar/page.js",[m
+[31m-  "/(admin)/admin/imoveis/page": "app/(admin)/admin/imoveis/page.js",[m
+[31m-  "/(admin)/admin/imoveis/novo/page": "app/(admin)/admin/imoveis/novo/page.js"[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m{}[m
+\ No newline at end of file[m
+[1mdiff --git a/.next/server/app/(admin)/admin/imoveis/[id]/editar/page.js b/.next/server/app/(admin)/admin/imoveis/[id]/editar/page.js[m
+[1mdeleted file mode 100644[m
+[1mindex 5258475..0000000[m
+[1m--- a/.next/server/app/(admin)/admin/imoveis/[id]/editar/page.js[m
+[1m+++ /dev/null[m
+[36m@@ -1,396 +0,0 @@[m
+[31m-/*[m
+[31m- * ATTENTION: An "eval-source-map" devtool has been used.[m
+[31m- * This devtool is neither made for production nor for readable output files.[m
+[31m- * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.[m
+[31m- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)[m
+[31m- * or disable the default devtool with "devtool: false".[m
+[31m- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).[m
+[31m- */[m
+[31m-(() => {[m
+[31m-var exports = {};[m
+[31m-exports.id = "app/(admin)/admin/imoveis/[id]/editar/page";[m
+[31m-exports.ids = ["app/(admin)/admin/imoveis/[id]/editar/page"];[m
+[31m-exports.modules = {[m
+[31m-[m
+[31m-/***/ "../../client/components/action-async-storage.external":[m
+[31m-/*!*******************************************************************************!*\[m
+[31m-  !*** external "next/dist/client/components/action-async-storage.external.js" ***![m
+[31m-  \*******************************************************************************/[m
+[31m-/***/ ((module) => {[m
+[31m-[m
+[31m-"use strict";[m
+[31m-module.exports = require("next/dist/client/components/action-async-storage.external.js");[m
+[31m-[m
+[31m-/***/ }),[m
+[31m-[m
+[31m-/***/ "../../client/components/request-async-storage.external":[m
+[31m-/*!********************************************************************************!*\[m
+[31m-  !*** external "next/dist/client/components/request-async-storage.external.js" ***![m
+[31m-  \********************************************************************************/[m
+[31m-/***/ ((module) => {[m
+[31m-[m
+[31m-"use strict";[m
+[31m-module.exports = require("next/dist/client/components/request-async-storage.external.js");[m
+[31m-[m
+[31m-/***/ }),[m
+[31m-[m
+[31m-/***/ "../../client/components/static-generation-async-storage.external":[m
+[31m-/*!******************************************************************************************!*\[m
+[31m-  !*** external "next/dist/client/components/static-generation-async-storage.external.js" ***![m
+[31m-  \******************************************************************************************/[m
+[31m-/***/ ((module) => {[m
+[31m-[m
+[31m-"use strict";[m
+[31m-module.exports = require("next/dist/client/components/static-generation-async-storage.external.js");[m
+[31m-[m
+[31m-/***/ }),[m
+[31m-[m
+[31m-/***/ "next/dist/compiled/next-server/app-page.runtime.dev.js":[m
+[31m-/*!*************************************************************************!*\[m
+[31m-  !*** external "next/dist/compiled/next-server/app-page.runtime.dev.js" ***![m
+[31m-  \*************************************************************************/[m
+[31m-/***/ ((module) => {[m
+[31m-[m
+[31m-"use strict";[m
+[31m-module.exports = require("next/dist/compiled/next-server/app-page.runtime.dev.js");[m
+[31m-[m
+[31m-/***/ }),[m
+[31m-[m
+[31m-/***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2F(admin)%2Fadmin%2Fimoveis%2F%5Bid%5D%2Feditar%2Fpage&page=%2F(admin)%2Fadmin%2Fimoveis%2F%5Bid%5D%2Feditar%2Fpage&appPaths=%2F(admin)%2Fadmin%2Fimoveis%2F%5Bid%5D%2Feditar%2Fpage&pagePath=private-next-app-dir%2F(admin)%2Fadmin%2Fimoveis%2F%5Bid%5D%2Feditar%2Fpage.tsx&appDir=C%3A%5CUsers%5CBruno%20Oliveira%5CDownloads%5Csite%5Cimoveis-app%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CBruno%20Oliveira%5CDownloads%5Csite%5Cimoveis-app&isDev=true
