@@ -17,7 +17,7 @@ export default function FiltrosSticky({
   cidades,
   bairros,
 }: {
-  categorias: string[];
+  categorias: OpcaoLocalidade[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
 }) {

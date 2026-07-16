@@ -1,6 +1,9 @@
 import ImovelForm from "@/components/admin/ImovelForm";
+import { getSugestoesFormulario } from "@/lib/supabase/imoveis-admin";
 
-export default function NovoImovelPage() {
+export default async function NovoImovelPage() {
+  const sugestoes = await getSugestoesFormulario();
+
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold text-navy-900">
@@ -12,7 +15,7 @@ export default function NovoImovelPage() {
       </p>
 
       <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-navy-900/5">
-        <ImovelForm modo="criar" />
+        <ImovelForm modo="criar" sugestoes={sugestoes} />
       </div>
     </div>
   );

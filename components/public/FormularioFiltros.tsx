@@ -13,17 +13,14 @@ const OPCOES_QUARTOS = ["1", "2", "3", "4", "5"];
 const OPCOES_VAGAS = ["1", "2", "3", "4"];
 
 // Valor "" representa "Ambos" — mesma convenção usada pelos demais filtros
-// (ausência de valor = sem restrição na busca).
+// (ausência de valor = sem restrição na busca). "Venda e Aluguel" não é uma
+// opção aqui: selecionar "Venda" ou "Aluguel" já inclui os imóveis com essa
+// finalidade dupla (ver aplicarFiltros em lib/supabase/imoveis.ts).
 const OPCOES_FINALIDADE: { label: string; value: string }[] = [
   { label: "Ambos", value: "" },
   { label: "Venda", value: "venda" },
   { label: "Aluguel", value: "aluguel" },
-  { label: "Venda e Aluguel", value: "venda_aluguel" },
 ];
-
-function capitalizar(texto: string) {
-  return texto.charAt(0).toUpperCase() + texto.slice(1);
-}
 
 const OPCOES_ORDENACAO = [
   { label: "Mais recentes", value: "" },
@@ -61,7 +58,7 @@ export default function FormularioFiltros({
   cidades,
   bairros,
 }: {
-  categorias: string[];
+  categorias: OpcaoLocalidade[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
   compacto?: boolean;
@@ -239,8 +236,8 @@ export default function FormularioFiltros({
         >
           <option value="">Todas as categorias</option>
           {categorias.map((categoria) => (
-            <option key={categoria} value={categoria}>
-              {capitalizar(categoria)}
+            <option key={categoria.valor} value={categoria.valor}>
+              {categoria.rotulo}
             </option>
           ))}
         </select>

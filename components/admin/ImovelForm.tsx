@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Campo, classesInput } from "@/components/ui/CampoFormulario";
 import { Finalidade, Imovel } from "@/lib/types/imovel";
 import { ehLinkYoutubeValido } from "@/lib/utils/youtube";
+import { SugestoesFormulario } from "@/lib/supabase/imoveis-admin";
 import {
   atualizarImovel,
   criarImovel,
@@ -14,9 +15,11 @@ import {
 export default function ImovelForm({
   modo,
   imovel,
+  sugestoes,
 }: {
   modo: "criar" | "editar";
   imovel?: Imovel;
+  sugestoes?: SugestoesFormulario;
 }) {
   const router = useRouter();
 
@@ -160,8 +163,14 @@ export default function ImovelForm({
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
               placeholder="Casa, apartamento, terreno..."
+              list="sugestoes-categoria"
               className={classesInput}
             />
+            <datalist id="sugestoes-categoria">
+              {sugestoes?.tipos.map((sugestao) => (
+                <option key={sugestao} value={sugestao} />
+              ))}
+            </datalist>
           </Campo>
         </div>
       </section>
@@ -176,16 +185,28 @@ export default function ImovelForm({
               required
               value={cidade}
               onChange={(e) => setCidade(e.target.value)}
+              list="sugestoes-cidade"
               className={classesInput}
             />
+            <datalist id="sugestoes-cidade">
+              {sugestoes?.cidades.map((sugestao) => (
+                <option key={sugestao} value={sugestao} />
+              ))}
+            </datalist>
           </Campo>
           <Campo label="Bairro" obrigatorio>
             <input
               required
               value={bairro}
               onChange={(e) => setBairro(e.target.value)}
+              list="sugestoes-bairro"
               className={classesInput}
             />
+            <datalist id="sugestoes-bairro">
+              {sugestoes?.bairros.map((sugestao) => (
+                <option key={sugestao} value={sugestao} />
+              ))}
+            </datalist>
           </Campo>
         </div>
       </section>

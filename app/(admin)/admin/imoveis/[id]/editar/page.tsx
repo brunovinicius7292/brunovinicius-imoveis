@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import ImovelForm from "@/components/admin/ImovelForm";
 import GerenciadorFotos from "@/components/admin/GerenciadorFotos";
-import { getImovelPorId, getFotosAdmin } from "@/lib/supabase/imoveis-admin";
+import {
+  getImovelPorId,
+  getFotosAdmin,
+  getSugestoesFormulario,
+} from "@/lib/supabase/imoveis-admin";
 
 export default async function EditarImovelPage({
   params,
@@ -15,6 +19,7 @@ export default async function EditarImovelPage({
   }
 
   const fotos = await getFotosAdmin(imovel.id);
+  const sugestoes = await getSugestoesFormulario();
 
   return (
     <div>
@@ -26,7 +31,7 @@ export default async function EditarImovelPage({
       </p>
 
       <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-navy-900/5">
-        <ImovelForm modo="editar" imovel={imovel} />
+        <ImovelForm modo="editar" imovel={imovel} sugestoes={sugestoes} />
       </div>
 
       <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-navy-900/5">

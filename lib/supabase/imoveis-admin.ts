@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
+import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 
 function mapRowParaImovelAdmin(row: any): Imovel {
   return {
@@ -84,4 +85,61 @@ export async function getFotosAdmin(imovelId: string): Promise<FotoImovel[]> {
   }
 
   return data ?? [];
+}
+
+export interface SugestoesFormulario {
+  tipos: string[];
+  cidades: string[];
+  bairros: string[];
+}
+
+// Categorias comerciais oferecidas como sugestão mesmo antes de existir algum
+// imóvel cadastrado com esse tipo — apenas rótulos de texto para ajudar o
+// preenchimento do campo (que continua livre), não cria nenhum imóvel.
+const TIPOS_SUGERIDOS_BASE = [
+  "Casa",
+  "Apartamento",
+  "Terreno",
+  "Loja",
+  "Galpão",
+  "Sala Comercial",
+  "Ponto Comercial",
+];
+
+// Deduplica ignorando maiúsculas/minúsculas e espaços, mantendo o rótulo
+// capitalizado por palavra.
+function listaUnica(valores: (string | null | undefined)[]): string[] {
+  const mapa = new Map<string, string>();
+
+  for (const valor of valores) {
+    if (!valor) continue;
+    const chave = chaveNormalizada(valor);
+    if (!mapa.has(chave)) {
+      mapa.set(chave, capitalizarPalavras(valor));
+    }
+  }
+
+  return Array.from(mapa.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
+// Sugestões (autocomplete) para os campos Categoria, Cidade e Bairro do
+// formulário de cadastro/edição — valores distintos entre TODOS os imóveis
+// já cadastrados (sem filtro de status/publicado, diferente das versões
+// usadas no site público), já que o admin deve poder reaproveitar qualquer
+// valor já usado. O campo continua sendo texto livre; isto é só sugestão.
+export async function getSugestoesFormulario(): Promise<SugestoesFormulario> {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase.from("imoveis").select("tipo, cidade, bairro");
+
+  if (error) {
+    console.error("Erro ao buscar sugestões do formulário:", error.message);
+    return { tipos: listaUnica(TIPOS_SUGERIDOS_BASE), cidades: [], bairros: [] };
+  }
+
+  return {
+    tipos: listaUnica([...TIPOS_SUGERIDOS_BASE, ...(data ?? []).map((linha) => linha.tipo)]),
+    cidades: listaUnica((data ?? []).map((linha) => linha.cidade)),
+    bairros: listaUnica((data ?? []).map((linha) => linha.bairro)),
+  };
 }

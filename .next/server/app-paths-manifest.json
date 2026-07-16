@@ -1,4 +1,6 @@
 {
   "/(public)/page": "app/(public)/page.js",
-  "/(public)/imovel/[slug]/page": "app/(public)/imovel/[slug]/page.js"
+  "/(admin)/admin/imoveis/page": "app/(admin)/admin/imoveis/page.js",
+  "/(admin)/admin/imoveis/novo/page": "app/(admin)/admin/imoveis/novo/page.js",
+  "/(admin)/admin/page": "app/(admin)/admin/page.js"
 }

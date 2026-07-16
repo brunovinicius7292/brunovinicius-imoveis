@@ -6,7 +6,7 @@ export default function Hero({
   cidades,
   bairros,
 }: {
-  categorias: string[];
+  categorias: OpcaoLocalidade[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
 }) {

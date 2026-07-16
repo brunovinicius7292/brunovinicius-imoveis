@@ -3,26 +3,34 @@
 import { useState } from "react";
 import { Imovel } from "@/lib/types/imovel";
 import CarrosselImoveis from "@/components/public/CarrosselImoveis";
+import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 
 // Quantidade de imóveis exibida antes do botão "Ver mais imóveis" aparecer.
 const QUANTIDADE_INICIAL = 6;
 
-function capitalizar(texto: string) {
-  return texto.charAt(0).toUpperCase() + texto.slice(1);
+interface GrupoCategoria {
+  rotulo: string;
+  imoveis: Imovel[];
 }
 
-function agruparPorCategoria(imoveis: Imovel[]): [string, Imovel[]][] {
-  const grupos = new Map<string, Imovel[]>();
+// Agrupa ignorando maiúsculas/minúsculas e espaços (ex.: "Apartamento" e
+// "apartamento" cadastrados com grafias diferentes caem no mesmo carrossel).
+function agruparPorCategoria(imoveis: Imovel[]): GrupoCategoria[] {
+  const grupos = new Map<string, GrupoCategoria>();
 
   for (const imovel of imoveis) {
-    const chave = imovel.tipo || "Outros";
-    const lista = grupos.get(chave) ?? [];
-    lista.push(imovel);
-    grupos.set(chave, lista);
+    const tipo = imovel.tipo || "Outros";
+    const chave = chaveNormalizada(tipo);
+    const grupo = grupos.get(chave);
+    if (grupo) {
+      grupo.imoveis.push(imovel);
+    } else {
+      grupos.set(chave, { rotulo: capitalizarPalavras(tipo), imoveis: [imovel] });
+    }
   }
 
-  return Array.from(grupos.entries()).sort((a, b) =>
-    a[0].localeCompare(b[0], "pt-BR")
+  return Array.from(grupos.values()).sort((a, b) =>
+    a.rotulo.localeCompare(b.rotulo, "pt-BR")
   );
 }
 
@@ -47,7 +55,7 @@ export default function SecaoImoveisAgrupados({
     ? imoveis
     : imoveis.slice(0, QUANTIDADE_INICIAL);
   const temMaisImoveis = !mostrarTodos && imoveis.length > QUANTIDADE_INICIAL;
-  const categorias = agruparPorCategoria(imoveisVisiveis);
+  const grupos = agruparPorCategoria(imoveisVisiveis);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
@@ -61,11 +69,11 @@ export default function SecaoImoveisAgrupados({
       </div>
 
       <div className="flex flex-col gap-10">
-        {categorias.map(([categoria, imoveisDaCategoria]) => (
+        {grupos.map((grupo) => (
           <CarrosselImoveis
-            key={categoria}
-            titulo={capitalizar(categoria)}
-            imoveis={imoveisDaCategoria}
+            key={grupo.rotulo}
+            titulo={grupo.rotulo}
+            imoveis={grupo.imoveis}
             contexto={contexto}
           />
         ))}

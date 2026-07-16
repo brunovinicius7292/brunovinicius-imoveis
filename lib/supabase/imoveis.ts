@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
+import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 
 type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -31,7 +32,10 @@ function aplicarFiltros(query: any, filtros?: FiltrosImoveis) {
     resultado = resultado.ilike("bairro", `%${filtros.bairro}%`);
   }
   if (filtros.categoria) {
-    resultado = resultado.eq("tipo", filtros.categoria);
+    // `categoria` chega normalizada (ver getCategoriasDisponiveis) — ilike sem
+    // "%" faz comparação exata, mas ignorando maiúsculas/minúsculas, o que
+    // cobre a mesma variação de grafia que a normalização de exibição trata.
+    resultado = resultado.ilike("tipo", filtros.categoria);
   }
   // "venda"/"aluguel" também deve trazer imóveis "venda_aluguel", já que estes
   // atendem às duas finalidades ao mesmo tempo.
@@ -170,7 +174,10 @@ export async function getImoveisPublicados(
 
 // Categorias (tipo) realmente em uso entre os imóveis publicados —
 // alimenta o seletor "Categoria" do formulário de filtros da Home.
-export async function getCategoriasDisponiveis(): Promise<string[]> {
+// Deduplicada ignorando maiúsculas/minúsculas e espaços (ex.: "Apartamento" e
+// "apartamento" cadastrados com grafias diferentes viram uma única opção),
+// mesma normalização já aplicada a cidade/bairro logo abaixo.
+export async function getCategoriasDisponiveis(): Promise<OpcaoLocalidade[]> {
   const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -184,32 +191,19 @@ export async function getCategoriasDisponiveis(): Promise<string[]> {
     return [];
   }
 
-  const categorias = new Set(
-    (data ?? []).map((linha) => linha.tipo).filter(Boolean)
+  const mapa = new Map<string, OpcaoLocalidade>();
+
+  for (const linha of data ?? []) {
+    if (!linha.tipo) continue;
+    const chave = chaveNormalizada(linha.tipo);
+    if (!mapa.has(chave)) {
+      mapa.set(chave, { valor: chave, rotulo: capitalizarPalavras(linha.tipo) });
+    }
+  }
+
+  return Array.from(mapa.values()).sort((a, b) =>
+    a.rotulo.localeCompare(b.rotulo, "pt-BR")
   );
-
-  return Array.from(categorias).sort((a, b) => a.localeCompare(b, "pt-BR"));
-}
-
-// Remove espaços duplicados/nas pontas.
-function normalizarTexto(texto: string) {
-  return texto.trim().replace(/\s+/g, " ");
-}
-
-// Chave usada para deduplicar ignorando maiúsculas/minúsculas e espaços.
-function chaveNormalizada(texto: string) {
-  return normalizarTexto(texto).toLowerCase();
-}
-
-// Rótulo exibido ao usuário, com a primeira letra de cada palavra maiúscula,
-// independente de como foi digitado no cadastro (ex.: "itabuna" -> "Itabuna").
-function capitalizarPalavras(texto: string) {
-  return normalizarTexto(texto)
-    .split(" ")
-    .map((palavra) =>
-      palavra ? palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase() : palavra
-    )
-    .join(" ");
 }
 
 export interface OpcaoLocalidade {

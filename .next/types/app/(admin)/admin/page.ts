@@ -1,8 +1,8 @@
-// File: C:\Users\Bruno Oliveira\Downloads\site\imoveis-app\app\(public)\imovel\[slug]\page.tsx
-import * as entry from '../../../../../../app/(public)/imovel/[slug]/page.js'
+// File: C:\Users\Bruno Oliveira\Downloads\site\imoveis-app\app\(admin)\admin\page.tsx
+import * as entry from '../../../../../app/(admin)/admin/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../../app/(public)/imovel/[slug]/page.js')
+type TEntry = typeof import('../../../../../app/(admin)/admin/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
