@@ -1,1 +1,6 @@
-{}
+{
+  "/(public)/page": "app/(public)/page.js",
+  "/(admin)/admin/imoveis/page": "app/(admin)/admin/imoveis/page.js",
+  "/(admin)/admin/page": "app/(admin)/admin/page.js",
+  "/(admin)/admin/imoveis/[id]/editar/page": "app/(admin)/admin/imoveis/[id]/editar/page.js"
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { OpcaoBairro, OpcaoLocalidade } from "@/lib/supabase/imoveis";
 
@@ -86,29 +86,76 @@ export default function FormularioFiltros({
     return bairros.filter((bairro) => bairro.cidade === filtros.cidade);
   }, [bairros, filtros.cidade]);
 
-  function atualizarCampo<K extends keyof FiltrosForm>(
+  function proximosFiltros<K extends keyof FiltrosForm>(
+    atual: FiltrosForm,
     campo: K,
     valor: string
-  ) {
-    setFiltros((atual) => {
-      if (campo === "cidade") {
-        // Trocar (ou limpar) a cidade invalida o bairro selecionado antes.
-        return { ...atual, cidade: valor, bairro: "" };
-      }
-      return { ...atual, [campo]: valor };
-    });
+  ): FiltrosForm {
+    if (campo === "cidade") {
+      // Trocar (ou limpar) a cidade invalida o bairro selecionado antes.
+      return { ...atual, cidade: valor, bairro: "" };
+    }
+    return { ...atual, [campo]: valor };
   }
 
-  function handleSubmit(evento: FormEvent) {
-    evento.preventDefault();
-
+  function navegarComFiltros(valores: FiltrosForm) {
     const params = new URLSearchParams();
-    Object.entries(filtros).forEach(([chave, valor]) => {
+    Object.entries(valores).forEach(([chave, valor]) => {
       if (valor) params.set(chave, valor);
     });
 
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : "/");
+  }
+
+  // Atualiza o campo apenas no estado local, sem aplicar na URL ainda.
+  // Usado pelo campo de preço, cujo apply é debounced (ver useEffect abaixo).
+  function atualizarCampo<K extends keyof FiltrosForm>(
+    campo: K,
+    valor: string
+  ) {
+    setFiltros((atual) => proximosFiltros(atual, campo, valor));
+  }
+
+  // Atualiza o campo e já aplica o filtro na hora (navega com os novos
+  // parâmetros), sem esperar o botão "Buscar". Usado por todos os campos
+  // exceto o preço, que precisa de debounce por ser digitado.
+  // Navegar dentro do updater do setFiltros dispara um aviso do React
+  // ("Cannot update a component while rendering a different component"),
+  // por isso o próximo valor é calculado fora e usado nas duas chamadas.
+  function aplicarCampo<K extends keyof FiltrosForm>(
+    campo: K,
+    valor: string
+  ) {
+    const proximo = proximosFiltros(filtros, campo, valor);
+    setFiltros(proximo);
+    navegarComFiltros(proximo);
+  }
+
+  const filtrosRef = useRef(filtros);
+  useEffect(() => {
+    filtrosRef.current = filtros;
+  }, [filtros]);
+
+  // Aplica o preço automaticamente pouco depois do cliente parar de digitar,
+  // em vez de a cada tecla (evitaria navegar várias vezes por segundo).
+  // Só dispara quando o valor realmente diverge do que já está na URL —
+  // assim não reaplica ao sincronizar a partir de navegação externa (ex.:
+  // botão "Limpar filtros" da tela de sem resultados).
+  useEffect(() => {
+    if (filtros.precoMax === (searchParams.get("precoMax") ?? "")) return;
+
+    const timer = setTimeout(() => {
+      navegarComFiltros(filtrosRef.current);
+    }, 500);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtros.precoMax, searchParams]);
+
+  function handleSubmit(evento: FormEvent) {
+    evento.preventDefault();
+    navegarComFiltros(filtros);
   }
 
   const classesCampo = `${classesCampoBase} h-11`;
@@ -133,7 +180,7 @@ export default function FormularioFiltros({
             type="button"
             role="tab"
             aria-selected={filtros.finalidade === opcao.value}
-            onClick={() => atualizarCampo("finalidade", opcao.value)}
+            onClick={() => aplicarCampo("finalidade", opcao.value)}
             className={`rounded-lg px-5 py-2 font-body text-sm font-semibold transition ${
               filtros.finalidade === opcao.value
                 ? "bg-navy-800 text-white"
@@ -149,7 +196,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Cidade"
           value={filtros.cidade}
-          onChange={(e) => atualizarCampo("cidade", e.target.value)}
+          onChange={(e) => aplicarCampo("cidade", e.target.value)}
           className={classesSelect(filtros.cidade)}
         >
           <option value="">Selecione uma cidade</option>
@@ -163,7 +210,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Bairro"
           value={filtros.bairro}
-          onChange={(e) => atualizarCampo("bairro", e.target.value)}
+          onChange={(e) => aplicarCampo("bairro", e.target.value)}
           disabled={!filtros.cidade}
           className={classesSelect(filtros.bairro)}
         >
@@ -187,7 +234,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Categoria"
           value={filtros.categoria}
-          onChange={(e) => atualizarCampo("categoria", e.target.value)}
+          onChange={(e) => aplicarCampo("categoria", e.target.value)}
           className={classesSelect(filtros.categoria)}
         >
           <option value="">Todas as categorias</option>
@@ -211,7 +258,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Quartos mínimos"
           value={filtros.quartos}
-          onChange={(e) => atualizarCampo("quartos", e.target.value)}
+          onChange={(e) => aplicarCampo("quartos", e.target.value)}
           className={classesSelect(filtros.quartos)}
         >
           <option value="">Qualquer quantidade de quartos</option>
@@ -225,7 +272,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Vagas mínimas"
           value={filtros.vagas}
-          onChange={(e) => atualizarCampo("vagas", e.target.value)}
+          onChange={(e) => aplicarCampo("vagas", e.target.value)}
           className={classesSelect(filtros.vagas)}
         >
           <option value="">Qualquer quantidade de vagas</option>
@@ -239,7 +286,7 @@ export default function FormularioFiltros({
         <select
           aria-label="Ordenar por"
           value={filtros.ordenar}
-          onChange={(e) => atualizarCampo("ordenar", e.target.value)}
+          onChange={(e) => aplicarCampo("ordenar", e.target.value)}
           className={classesSelect(filtros.ordenar)}
         >
           {OPCOES_ORDENACAO.map((opcao) => (

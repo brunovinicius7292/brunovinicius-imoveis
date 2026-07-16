@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Imovel } from "@/lib/types/imovel";
-import ImovelCard from "@/components/public/ImovelCard";
+import CarrosselImoveis from "@/components/public/CarrosselImoveis";
 
-// 6 imóveis preenchem exatamente 2 linhas completas na grade de 3 colunas
-// do desktop, evitando uma última linha "quebrada" ao carregar a seção.
+// Quantidade de imóveis exibida antes do botão "Ver mais imóveis" aparecer.
 const QUANTIDADE_INICIAL = 6;
 
 function capitalizar(texto: string) {
@@ -63,16 +62,12 @@ export default function SecaoImoveisAgrupados({
 
       <div className="flex flex-col gap-10">
         {categorias.map(([categoria, imoveisDaCategoria]) => (
-          <div key={categoria}>
-            <h3 className="mb-4 font-display text-xl font-semibold text-navy-800">
-              {capitalizar(categoria)}
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {imoveisDaCategoria.map((imovel) => (
-                <ImovelCard key={imovel.id} imovel={imovel} contexto={contexto} />
-              ))}
-            </div>
-          </div>
+          <CarrosselImoveis
+            key={categoria}
+            titulo={capitalizar(categoria)}
+            imoveis={imoveisDaCategoria}
+            contexto={contexto}
+          />
         ))}
       </div>
 
