@@ -64,6 +64,7 @@ export default function FormularioFiltros({
   categorias: string[];
   cidades: OpcaoLocalidade[];
   bairros: OpcaoBairro[];
+  compacto?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();

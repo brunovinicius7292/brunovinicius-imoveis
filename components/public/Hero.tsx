@@ -25,7 +25,7 @@ export default function Hero({
 
       <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
         <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.15] text-white sm:text-5xl">
-          TESTE CHAT GPT 123
+          Compra, venda e aluguel de imóveis em Itabuna e região.
         </h1>
         <p className="mt-4 font-body text-sm font-medium uppercase tracking-[0.3em] text-gold-300">
           CRECI-BA 30.048
