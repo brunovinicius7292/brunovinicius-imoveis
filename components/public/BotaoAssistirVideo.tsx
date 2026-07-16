@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 // Botão que fica sobre a thumbnail do YouTube (quando o imóvel não tem
 // fotos) e abre o vídeo em um modal na própria página, em vez de redirecionar
@@ -14,6 +15,7 @@ export default function BotaoAssistirVideo({
   titulo: string;
 }) {
   const [aberto, setAberto] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (!aberto) return;
@@ -26,11 +28,37 @@ export default function BotaoAssistirVideo({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [aberto]);
 
+  // Abre o modal e já pede tela cheia no mesmo clique — precisa de flushSync
+  // para o iframe existir no DOM antes de pedir a tela cheia, ainda dentro do
+  // mesmo gesto do usuário (navegadores exigem isso para aceitar o pedido).
+  // Em navegadores/dispositivos sem suporte (ex.: Safari no iPhone), o pedido
+  // é simplesmente ignorado e o vídeo continua tocando normalmente no modal.
+  function assistirEmTelaCheia() {
+    flushSync(() => setAberto(true));
+
+    const iframe = iframeRef.current as (HTMLIFrameElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    }) | null;
+    if (!iframe) return;
+
+    const pedirTelaCheia =
+      iframe.requestFullscreen?.bind(iframe) ??
+      iframe.webkitRequestFullscreen?.bind(iframe) ??
+      iframe.msRequestFullscreen?.bind(iframe);
+
+    try {
+      pedirTelaCheia?.()?.catch(() => {});
+    } catch {
+      // Fullscreen indisponível neste navegador — segue tocando no modal.
+    }
+  }
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setAberto(true)}
+        onClick={assistirEmTelaCheia}
         className="absolute inset-0 flex items-center justify-center bg-navy-900/30 transition hover:bg-navy-900/40"
       >
         <span className="flex items-center gap-2 rounded-full bg-white/90 px-5 py-2.5 font-body text-sm font-semibold text-navy-900 shadow-lg">
@@ -68,7 +96,12 @@ export default function BotaoAssistirVideo({
             className="aspect-video w-full max-w-3xl overflow-hidden rounded-2xl shadow-2xl"
           >
             <iframe
-              src={`${urlEmbed}${urlEmbed.includes("?") ? "&" : "?"}autoplay=1`}
+              ref={iframeRef}
+              // "vq" é uma sugestão de qualidade inicial (não garantida nem
+              // documentada oficialmente pelo YouTube) — o player decide a
+              // qualidade final sozinho, conforme a conexão no momento, e a
+              // pessoa pode trocar manualmente a qualquer momento.
+              src={`${urlEmbed}${urlEmbed.includes("?") ? "&" : "?"}autoplay=1&vq=hd720`}
               title={`Vídeo do imóvel ${titulo}`}
               className="h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -116,18 +116,21 @@ export default async function PaginaImovel({
               </div>
             )}
 
-            {fotos.length > 0 && urlEmbedVideo && (
+            {fotos.length > 0 && urlEmbedVideo && thumbnailVideo && (
               <div className="mt-6">
                 <h2 className="font-display text-xl font-semibold text-navy-900">
                   Vídeo
                 </h2>
-                <div className="mt-2 aspect-video overflow-hidden rounded-2xl">
-                  <iframe
-                    src={urlEmbedVideo}
-                    title={`Vídeo do imóvel ${imovel.titulo}`}
-                    className="h-full w-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                <div className="relative mt-2 aspect-video overflow-hidden rounded-2xl">
+                  <ImagemImovel
+                    src={thumbnailVideo}
+                    srcFallback={thumbnailVideoFallback}
+                    alt={`Vídeo do imóvel ${imovel.titulo}`}
+                    className="h-full w-full object-cover"
+                  />
+                  <BotaoAssistirVideo
+                    urlEmbed={urlEmbedVideo}
+                    titulo={imovel.titulo}
                   />
                 </div>
               </div>
