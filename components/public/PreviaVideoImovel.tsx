@@ -23,8 +23,19 @@ export default function PreviaVideoImovel({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visivel, setVisivel] = useState(false);
+  // Autoplay é exclusivo de dispositivos touch (celular/tablet). No
+  // computador, com mouse/hover disponível, a informação/movimento de vários
+  // vídeos tocando lado a lado ficava carregada demais — lá o card volta a
+  // mostrar só a foto estática, como antes dessa funcionalidade existir.
+  const [ehTouch, setEhTouch] = useState(false);
 
   useEffect(() => {
+    setEhTouch(window.matchMedia("(hover: none) and (pointer: coarse)").matches);
+  }, []);
+
+  useEffect(() => {
+    if (!ehTouch) return;
+
     const elemento = containerRef.current;
     if (!elemento) return;
 
@@ -34,7 +45,7 @@ export default function PreviaVideoImovel({
     );
     observer.observe(elemento);
     return () => observer.disconnect();
-  }, []);
+  }, [ehTouch]);
 
   return (
     <div ref={containerRef} className={`relative ${className ?? ""}`}>
@@ -44,7 +55,7 @@ export default function PreviaVideoImovel({
         alt={alt}
         className="absolute inset-0 h-full w-full object-cover"
       />
-      {visivel && (
+      {ehTouch && visivel && (
         <iframe
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&playsinline=1&rel=0`}
           title={alt}
