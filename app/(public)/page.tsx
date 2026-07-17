@@ -92,18 +92,22 @@ export default async function Home({
       ) : (
         <>
           <FeaturedSection imoveis={imoveisDestaque} />
-          <SecaoImoveisAgrupados
-            legenda="Para alugar"
-            titulo="Imóveis para aluguel"
-            imoveis={imoveisAluguel}
-            contexto="aluguel"
-          />
-          <SecaoImoveisAgrupados
-            legenda="Para comprar"
-            titulo="Imóveis para venda"
-            imoveis={imoveisVenda}
-            contexto="venda"
-          />
+          {filtros.finalidade !== "venda" && (
+            <SecaoImoveisAgrupados
+              legenda="Para alugar"
+              titulo="Imóveis para aluguel"
+              imoveis={imoveisAluguel}
+              contexto="aluguel"
+            />
+          )}
+          {filtros.finalidade !== "aluguel" && (
+            <SecaoImoveisAgrupados
+              legenda="Para comprar"
+              titulo="Imóveis para venda"
+              imoveis={imoveisVenda}
+              contexto="venda"
+            />
+          )}
         </>
       )}
 
