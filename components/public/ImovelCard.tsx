@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Imovel } from "@/lib/types/imovel";
-import { obterThumbnailYoutube } from "@/lib/utils/youtube";
+import { extrairIdYoutube, obterThumbnailYoutube } from "@/lib/utils/youtube";
 import ImagemImovel from "@/components/public/ImagemImovel";
+import PreviaVideoImovel from "@/components/public/PreviaVideoImovel";
 import { formatarMoeda } from "@/lib/utils/preco";
 
 function formatarPreco(imovel: Imovel) {
@@ -75,6 +76,9 @@ export default function ImovelCard({
     ? null
     : obterThumbnailYoutube(imovel.videoYoutubeUrl, "hqdefault");
   const usandoThumbnailVideo = Boolean(thumbnailVideo);
+  const idVideoYoutube = usandoThumbnailVideo
+    ? extrairIdYoutube(imovel.videoYoutubeUrl ?? "")
+    : null;
 
   const imagemPrincipal =
     imovel.fotoCapaUrl || thumbnailVideo || fotoExemploUrl(imovel);
@@ -82,12 +86,22 @@ export default function ImovelCard({
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-navy-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative overflow-hidden">
-        <ImagemImovel
-          src={imagemPrincipal}
-          srcFallback={usandoThumbnailVideo ? thumbnailVideoFallback : null}
-          alt={imovel.titulo}
-          className="h-48 w-full object-cover transition duration-500 group-hover:scale-105"
-        />
+        {idVideoYoutube ? (
+          <PreviaVideoImovel
+            videoId={idVideoYoutube}
+            posterUrl={imagemPrincipal}
+            posterFallbackUrl={thumbnailVideoFallback}
+            alt={imovel.titulo}
+            className="h-48 w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <ImagemImovel
+            src={imagemPrincipal}
+            srcFallback={usandoThumbnailVideo ? thumbnailVideoFallback : null}
+            alt={imovel.titulo}
+            className="h-48 w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-900/40 via-transparent to-transparent" />
         <span className="absolute left-3 top-3 rounded-full bg-navy-900/90 px-3 py-1 font-body text-xs font-medium uppercase tracking-wide text-gold-300 shadow-sm">
           {BADGES_FINALIDADE[imovel.finalidade] ?? imovel.finalidade}
