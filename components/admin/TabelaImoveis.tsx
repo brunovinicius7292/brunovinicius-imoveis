@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Imovel } from "@/lib/types/imovel";
@@ -22,11 +22,23 @@ function formatarValor(imovel: Imovel) {
   return formatarMoeda(imovel.preco);
 }
 
+type OrdemValor = "asc" | "desc";
+
 export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [idExcluindo, setIdExcluindo] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [ordemValor, setOrdemValor] = useState<OrdemValor>("asc");
+
+  function alternarOrdemValor() {
+    setOrdemValor((atual) => (atual === "asc" ? "desc" : "asc"));
+  }
+
+  const imoveisOrdenados = useMemo(() => {
+    const multiplicador = ordemValor === "asc" ? 1 : -1;
+    return [...imoveis].sort((a, b) => (a.preco - b.preco) * multiplicador);
+  }, [imoveis, ordemValor]);
 
   async function handleExcluir(imovel: Imovel) {
     const confirmar = window.confirm(
@@ -81,14 +93,24 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
             <th className="px-4 py-3 font-medium">Categoria</th>
             <th className="px-4 py-3 font-medium">Cidade</th>
             <th className="px-4 py-3 font-medium">Bairro</th>
-            <th className="px-4 py-3 font-medium">Valor</th>
+            <th className="px-4 py-3 font-medium">
+              <button
+                type="button"
+                onClick={alternarOrdemValor}
+                className="flex items-center gap-1 font-medium hover:text-navy-700"
+              >
+                Valor
+                {ordemValor === "asc" && <span aria-hidden>↑</span>}
+                {ordemValor === "desc" && <span aria-hidden>↓</span>}
+              </button>
+            </th>
             <th className="px-4 py-3 font-medium">Destaque</th>
             <th className="px-4 py-3 font-medium">Publicado</th>
             <th className="px-4 py-3 font-medium">Ações</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-navy-900/5">
-          {imoveis.map((imovel) => (
+          {imoveisOrdenados.map((imovel) => (
             <tr key={imovel.id}>
               <td className="px-4 py-3 text-navy-600">
                 {imovel.codigo || "—"}
