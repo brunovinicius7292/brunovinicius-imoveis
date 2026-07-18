@@ -57,8 +57,8 @@ function gerarFaixas(valores: number[], passo: number): Faixa[] {
   return faixas;
 }
 
-function codificarFaixa(faixa: Faixa) {
-  return `${faixa.min}-${faixa.max}`;
+function codificarFaixa(faixa: Faixa, aberta: boolean) {
+  return aberta ? `${faixa.min}-mais` : `${faixa.min}-${faixa.max}`;
 }
 
 export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
@@ -102,8 +102,12 @@ export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
       if (faixaPreco && passoFaixa) {
         const [minTexto, maxTexto] = faixaPreco.split("-");
         const min = Number(minTexto);
-        const max = Number(maxTexto);
-        if (imovel.preco < min || imovel.preco >= max) return false;
+        if (maxTexto === "mais") {
+          if (imovel.preco < min) return false;
+        } else {
+          const max = Number(maxTexto);
+          if (imovel.preco < min || imovel.preco >= max) return false;
+        }
       }
 
       return true;
@@ -217,11 +221,17 @@ export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
                   ? "Todas as faixas"
                   : "Selecione Venda ou Aluguel"}
               </option>
-              {faixas.map((faixa) => (
-                <option key={codificarFaixa(faixa)} value={codificarFaixa(faixa)}>
-                  {formatarMoeda(faixa.min)} – {formatarMoeda(faixa.max)}
-                </option>
-              ))}
+              {faixas.map((faixa, indice) => {
+                const aberta = indice === faixas.length - 1;
+                const valor = codificarFaixa(faixa, aberta);
+                return (
+                  <option key={valor} value={valor}>
+                    {aberta
+                      ? `${formatarMoeda(faixa.max)} ou mais`
+                      : `${formatarMoeda(faixa.min)} – ${formatarMoeda(faixa.max)}`}
+                  </option>
+                );
+              })}
             </select>
           </Campo>
         </div>

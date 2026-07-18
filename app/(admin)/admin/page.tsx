@@ -13,7 +13,8 @@ export default function AdminDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <CartaoBoasVindas
           titulo="Imóveis"
-          descricao="Em breve você poderá cadastrar e gerenciar seus imóveis por aqui."
+          descricao="Cadastre, edite e gerencie os imóveis do seu catálogo."
+          href="/admin/imoveis"
         />
         <CartaoBoasVindas
           titulo="Clientes"
