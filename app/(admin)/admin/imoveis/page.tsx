@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getImoveisAdmin } from "@/lib/supabase/imoveis-admin";
-import TabelaImoveis from "@/components/admin/TabelaImoveis";
+import FiltrosImoveis from "@/components/admin/FiltrosImoveis";
 
 export default async function AdminImoveisPage() {
   const imoveis = await getImoveisAdmin();
@@ -26,7 +26,7 @@ export default async function AdminImoveisPage() {
       </div>
 
       <div className="mt-6">
-        <TabelaImoveis imoveis={imoveis} />
+        <FiltrosImoveis imoveis={imoveis} />
       </div>
     </div>
   );
