@@ -37,9 +37,11 @@ function opcoesUnicas(valores: (string | null | undefined)[]): Opcao[] {
     .sort((a, b) => a.rotulo.localeCompare(b.rotulo, "pt-BR"));
 }
 
-// Gera faixas de preço de largura `passo`, arredondando o menor valor para
-// baixo e o maior para cima até o múltiplo de `passo`, garantindo que a
-// última faixa sempre ultrapasse o imóvel mais caro.
+// Gera faixas de preço de largura `passo`, cobrindo do menor ao maior valor
+// cadastrado em intervalos fechados, e sempre acrescenta uma faixa aberta
+// final ("X ou mais") a partir do próximo múltiplo da régua acima do maior
+// valor — essa última faixa só filtra o que o próprio rótulo promete.
+// Usada apenas para Aluguel (Venda usa a régua fixa abaixo).
 function gerarFaixas(valores: number[], passo: number): Faixa[] {
   if (valores.length === 0) return [];
 
@@ -47,18 +49,56 @@ function gerarFaixas(valores: number[], passo: number): Faixa[] {
   const maior = Math.max(...valores);
 
   const inicio = Math.floor(menor / passo) * passo;
-  let fim = Math.ceil(maior / passo) * passo;
-  if (fim <= maior) fim += passo;
+  const topo = Math.ceil(maior / passo) * passo;
 
   const faixas: Faixa[] = [];
-  for (let atual = inicio; atual < fim; atual += passo) {
+  for (let atual = inicio; atual < topo; atual += passo) {
     faixas.push({ min: atual, max: atual + passo });
   }
+  faixas.push({ min: topo, max: Infinity });
+
   return faixas;
 }
 
-function codificarFaixa(faixa: Faixa, aberta: boolean) {
-  return aberta ? `${faixa.min}-mais` : `${faixa.min}-${faixa.max}`;
+// Régua fixa de Venda: R$100 mil em R$100 mil até R$1 milhão, depois R$500
+// mil em R$500 mil até R$2 milhões, sempre terminando em "R$2.000.000 ou
+// mais" — independente dos imóveis cadastrados.
+function gerarFaixasVenda(): Faixa[] {
+  const faixas: Faixa[] = [];
+
+  for (let atual = 0; atual < 1000000; atual += 100000) {
+    faixas.push({ min: atual, max: atual + 100000 });
+  }
+  for (let atual = 1000000; atual < 2000000; atual += 500000) {
+    faixas.push({ min: atual, max: atual + 500000 });
+  }
+  faixas.push({ min: 2000000, max: Infinity });
+
+  return faixas;
+}
+
+function codificarFaixa(faixa: Faixa) {
+  return Number.isFinite(faixa.max) ? `${faixa.min}-${faixa.max}` : `${faixa.min}-mais`;
+}
+
+// Valor do imóvel relevante para a finalidade filtrada: para "venda", tanto
+// imóveis de venda quanto os "venda e aluguel" usam o campo `preco`; para
+// "aluguel", imóveis de aluguel usam `preco` e os "venda e aluguel" usam
+// `precoAluguel`. Retorna undefined quando o imóvel não se aplica.
+function valorParaFinalidade(
+  imovel: Imovel,
+  alvo: "venda" | "aluguel"
+): number | undefined {
+  if (alvo === "venda") {
+    if (imovel.finalidade === "venda" || imovel.finalidade === "venda_aluguel") {
+      return imovel.preco;
+    }
+    return undefined;
+  }
+
+  if (imovel.finalidade === "aluguel") return imovel.preco;
+  if (imovel.finalidade === "venda_aluguel") return imovel.precoAluguel;
+  return undefined;
 }
 
 export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
@@ -77,13 +117,17 @@ export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
     finalidade === "venda" ? 100000 : finalidade === "aluguel" ? 1000 : null;
 
   const faixas = useMemo(() => {
-    if (!passoFaixa) return [];
-    const valores = imoveis
-      .filter((imovel) => imovel.finalidade === finalidade)
-      .map((imovel) => imovel.preco)
-      .filter((valor) => typeof valor === "number" && !Number.isNaN(valor));
-    return gerarFaixas(valores, passoFaixa);
-  }, [imoveis, finalidade, passoFaixa]);
+    if (finalidade === "venda") return gerarFaixasVenda();
+
+    if (finalidade === "aluguel") {
+      const valores = imoveis
+        .map((imovel) => valorParaFinalidade(imovel, "aluguel"))
+        .filter((valor): valor is number => typeof valor === "number" && !Number.isNaN(valor));
+      return gerarFaixas(valores, 1000);
+    }
+
+    return [];
+  }, [imoveis, finalidade]);
 
   function handleFinalidadeChange(valor: string) {
     setFinalidade(valor as Finalidade | "");
@@ -92,27 +136,37 @@ export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
 
   const imoveisFiltrados = useMemo(() => {
     return imoveis.filter((imovel) => {
-      if (finalidade && imovel.finalidade !== finalidade) return false;
+      if (finalidade === "venda" || finalidade === "aluguel") {
+        const aplicavel =
+          imovel.finalidade === finalidade || imovel.finalidade === "venda_aluguel";
+        if (!aplicavel) return false;
+      } else if (finalidade && imovel.finalidade !== finalidade) {
+        return false;
+      }
+
       if (tipo && chaveNormalizada(imovel.tipo) !== tipo) return false;
       if (cidade && chaveNormalizada(imovel.cidade) !== cidade) return false;
       if (bairro && chaveNormalizada(imovel.bairro) !== bairro) return false;
       if (publicado === "sim" && !imovel.publicado) return false;
       if (publicado === "nao" && imovel.publicado) return false;
 
-      if (faixaPreco && passoFaixa) {
+      if (faixaPreco && (finalidade === "venda" || finalidade === "aluguel")) {
+        const valor = valorParaFinalidade(imovel, finalidade);
+        if (valor === undefined) return false;
+
         const [minTexto, maxTexto] = faixaPreco.split("-");
         const min = Number(minTexto);
         if (maxTexto === "mais") {
-          if (imovel.preco < min) return false;
+          if (valor < min) return false;
         } else {
           const max = Number(maxTexto);
-          if (imovel.preco < min || imovel.preco >= max) return false;
+          if (valor < min || valor >= max) return false;
         }
       }
 
       return true;
     });
-  }, [imoveis, finalidade, tipo, cidade, bairro, publicado, faixaPreco, passoFaixa]);
+  }, [imoveis, finalidade, tipo, cidade, bairro, publicado, faixaPreco]);
 
   function limparFiltros() {
     setFinalidade("");
@@ -221,13 +275,13 @@ export default function FiltrosImoveis({ imoveis }: { imoveis: Imovel[] }) {
                   ? "Todas as faixas"
                   : "Selecione Venda ou Aluguel"}
               </option>
-              {faixas.map((faixa, indice) => {
-                const aberta = indice === faixas.length - 1;
-                const valor = codificarFaixa(faixa, aberta);
+              {faixas.map((faixa) => {
+                const aberta = !Number.isFinite(faixa.max);
+                const valor = codificarFaixa(faixa);
                 return (
                   <option key={valor} value={valor}>
                     {aberta
-                      ? `${formatarMoeda(faixa.max)} ou mais`
+                      ? `${formatarMoeda(faixa.min)} ou mais`
                       : `${formatarMoeda(faixa.min)} – ${formatarMoeda(faixa.max)}`}
                   </option>
                 );
