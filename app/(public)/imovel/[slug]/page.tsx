@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
 import Galeria from "@/components/public/Galeria";
@@ -13,10 +14,46 @@ import ImagemImovel from "@/components/public/ImagemImovel";
 import BotaoAssistirVideo from "@/components/public/BotaoAssistirVideo";
 import { Imovel } from "@/lib/types/imovel";
 import { formatarMoeda, ROTULOS_FINALIDADE } from "@/lib/utils/preco";
+import { obterUrlImovel, obterUrlSite } from "@/lib/utils/site";
 
 function formatarPreco(imovel: Imovel) {
   const valor = formatarMoeda(imovel.preco);
   return imovel.finalidade === "aluguel" ? `${valor}/mês` : valor;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const imovel = await getImovelPorSlug(params.slug);
+
+  if (!imovel) {
+    return {};
+  }
+
+  const url = obterUrlImovel(imovel.slug);
+  const descricao = `${imovel.bairro}, ${imovel.cidade} · ${formatarPreco(imovel)}`;
+  const imagem = imovel.fotoCapaUrl || `${obterUrlSite()}/image.png`;
+
+  return {
+    title: imovel.titulo,
+    description: descricao,
+    openGraph: {
+      title: imovel.titulo,
+      description: descricao,
+      url,
+      type: "website",
+      locale: "pt_BR",
+      images: [{ url: imagem, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: imovel.titulo,
+      description: descricao,
+      images: [imagem],
+    },
+  };
 }
 
 export default async function PaginaImovel({
@@ -164,7 +201,7 @@ export default async function PaginaImovel({
             )}
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <BotaoWhatsApp titulo={imovel.titulo} />
+              <BotaoWhatsApp titulo={imovel.titulo} slug={imovel.slug} />
               <BotaoCompartilhar titulo={imovel.titulo} />
             </div>
           </aside>

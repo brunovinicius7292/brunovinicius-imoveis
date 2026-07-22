@@ -1,10 +1,19 @@
+import { obterUrlImovel } from "@/lib/utils/site";
+
 function apenasNumeros(valor: string) {
   return valor.replace(/\D/g, "");
 }
 
-export default function BotaoWhatsApp({ titulo }: { titulo: string }) {
+export default function BotaoWhatsApp({
+  titulo,
+  slug,
+}: {
+  titulo: string;
+  slug: string;
+}) {
   const numero = apenasNumeros(process.env.NEXT_PUBLIC_WHATSAPP_NUMERO ?? "");
-  const mensagem = `Olá! Tenho interesse neste imóvel: ${titulo}. Poderia me passar mais informações?`;
+  const urlImovel = obterUrlImovel(slug);
+  const mensagem = `Olá! Tenho interesse neste imóvel: ${titulo} – ${urlImovel}. Poderia me passar mais informações?`;
   const href = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
 
   return (
