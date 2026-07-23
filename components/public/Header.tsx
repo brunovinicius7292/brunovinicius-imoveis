@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -29,9 +30,9 @@ export default function Header() {
           <a href="#" className="transition hover:text-gold-300">
             Sobre
           </a>
-          <a href="#" className="transition hover:text-gold-300">
+          <Link href="/contato" className="transition hover:text-gold-300">
             Contato
-          </a>
+          </Link>
         </nav>
       </div>
     </header>
