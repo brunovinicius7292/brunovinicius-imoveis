@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Header from "@/components/public/Header";
 import Hero from "@/components/public/Hero";
 import FeaturedSection from "@/components/public/FeaturedSection";
@@ -12,6 +13,32 @@ import {
   getImoveisDestaque,
   getImoveisPublicados,
 } from "@/lib/supabase/imoveis";
+import { obterUrlSite } from "@/lib/utils/site";
+
+const TITULO_HOME = "Bruno Vinícius Imóveis";
+const DESCRICAO_HOME =
+  "Compra, venda e aluguel de imóveis em Itabuna e região.";
+
+export const metadata: Metadata = {
+  title: TITULO_HOME,
+  description: DESCRICAO_HOME,
+  openGraph: {
+    title: TITULO_HOME,
+    description: DESCRICAO_HOME,
+    url: obterUrlSite(),
+    type: "website",
+    locale: "pt_BR",
+    images: [
+      { url: `${obterUrlSite()}/capa-hero.png`, width: 1200, height: 630 },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO_HOME,
+    description: DESCRICAO_HOME,
+    images: [`${obterUrlSite()}/capa-hero.png`],
+  },
+};
 
 type ValorParam = string | string[] | undefined;
 

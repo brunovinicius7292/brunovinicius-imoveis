@@ -1,3 +1,4 @@
+import Image from "next/image";
 import FormularioFiltros from "@/components/public/FormularioFiltros";
 import { OpcaoBairro, OpcaoLocalidade } from "@/lib/supabase/imoveis";
 
@@ -12,15 +13,21 @@ export default function Hero({
 }) {
   return (
     <section className="relative overflow-hidden bg-navy-900">
-      {/* Textura sutil de fundo */}
+      <Image
+        src="/capa-hero.png"
+        alt="Bruno Vinícius Imóveis"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center"
+      />
+
+      {/* Overlay escuro para garantir contraste do texto/busca, mais forte
+          à esquerda (onde fica o conteúdo) e suave à direita (onde a foto
+          fica mais visível). */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, #C9A24B 1px, transparent 0)",
-          backgroundSize: "28px 28px",
-        }}
+        className="absolute inset-0 bg-gradient-to-br from-black/75 via-black/40 to-transparent"
       />
 
       <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
