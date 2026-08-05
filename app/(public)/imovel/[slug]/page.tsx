@@ -6,6 +6,7 @@ import Galeria from "@/components/public/Galeria";
 import FotoPlaceholder from "@/components/ui/FotoPlaceholder";
 import BotaoWhatsApp from "@/components/public/BotaoWhatsApp";
 import BotaoCompartilhar from "@/components/public/BotaoCompartilhar";
+import BotaoSelecao from "@/components/public/BotaoSelecao";
 import BotaoVoltar from "@/components/public/BotaoVoltar";
 import { getImovelPorSlug, getFotosDoImovel } from "@/lib/supabase/imoveis";
 import { obterUrlEmbedYoutube, obterThumbnailYoutube } from "@/lib/utils/youtube";
@@ -203,6 +204,9 @@ export default async function PaginaImovel({
             <div className="mt-5 flex flex-col gap-3 sm:flex-row lg:flex-col">
               <BotaoWhatsApp titulo={imovel.titulo} slug={imovel.slug} />
               <BotaoCompartilhar titulo={imovel.titulo} />
+            </div>
+            <div className="mt-3">
+              <BotaoSelecao imovelId={imovel.id} variante="detalhe" />
             </div>
           </aside>
         </div>

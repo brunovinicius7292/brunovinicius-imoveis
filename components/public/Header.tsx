@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import LinkMinhaSelecao from "@/components/public/LinkMinhaSelecao";
 
 export default function Header() {
   return (
@@ -24,15 +25,16 @@ export default function Header() {
         </div>
 
         <nav className="hidden items-center gap-8 font-body text-sm text-navy-100 sm:flex">
-          <a href="#destaques" className="transition hover:text-gold-300">
-            Destaques
-          </a>
+          <Link href="/" className="transition hover:text-gold-300">
+            Início
+          </Link>
           <a href="#" className="transition hover:text-gold-300">
             Sobre
           </a>
           <Link href="/contato" className="transition hover:text-gold-300">
             Contato
           </Link>
+          <LinkMinhaSelecao />
         </nav>
       </div>
     </header>
