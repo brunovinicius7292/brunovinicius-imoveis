@@ -3,6 +3,7 @@ import { Imovel } from "@/lib/types/imovel";
 import { extrairIdYoutube, obterThumbnailYoutube } from "@/lib/utils/youtube";
 import ImagemImovel from "@/components/public/ImagemImovel";
 import PreviaVideoImovel from "@/components/public/PreviaVideoImovel";
+import BotaoSelecao from "@/components/public/BotaoSelecao";
 import { formatarMoeda } from "@/lib/utils/preco";
 
 function formatarPreco(imovel: Imovel) {
@@ -106,8 +107,11 @@ export default function ImovelCard({
         <span className="absolute left-3 top-3 rounded-full bg-navy-900/90 px-3 py-1 font-body text-xs font-medium uppercase tracking-wide text-gold-300 shadow-sm">
           {BADGES_FINALIDADE[imovel.finalidade] ?? imovel.finalidade}
         </span>
+        <div className="absolute right-3 top-3">
+          <BotaoSelecao imovelId={imovel.id} variante="card" />
+        </div>
         {usandoThumbnailVideo && (
-          <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-navy-900/80 px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-gold-200 shadow-md ring-1 ring-white/10 backdrop-blur-sm">
+          <span className="absolute right-3 top-14 flex items-center gap-1.5 rounded-full bg-navy-900/80 px-3 py-1.5 font-body text-[11px] font-semibold uppercase tracking-wider text-gold-200 shadow-md ring-1 ring-white/10 backdrop-blur-sm">
             <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3">
               <path d="M8 5v14l11-7Z" />
             </svg>

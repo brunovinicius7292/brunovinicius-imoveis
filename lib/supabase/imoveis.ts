@@ -306,6 +306,29 @@ export async function getImovelPorSlug(slug: string): Promise<Imovel | null> {
   return data ? mapRowParaImovel(data, supabase) : null;
 }
 
+// Imóveis salvos em "Minha seleção" (lista de ids vinda do localStorage no
+// cliente) — mesma regra de visibilidade de getImovelPorSlug (só publicado),
+// já que o imóvel pode ter sido salvo antes e o visitante deve continuar
+// vendo o que salvou mesmo que o status tenha mudado depois.
+export async function getImoveisPorIds(ids: string[]): Promise<Imovel[]> {
+  if (ids.length === 0) return [];
+
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("imoveis")
+    .select("*, imovel_fotos(url, ordem)")
+    .in("id", ids)
+    .eq("publicado", true);
+
+  if (error) {
+    console.error("Erro ao buscar imóveis da seleção:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((row: any) => mapRowParaImovel(row, supabase));
+}
+
 // URLs públicas das fotos de um imóvel, na ordem definida em
 // `imovel_fotos.ordem` — converte o caminho salvo no banco em URL do Storage.
 export async function getFotosDoImovel(imovelId: string): Promise<string[]> {

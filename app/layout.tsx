@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { obterUrlSite } from "@/lib/utils/site";
+import { SelecaoProvider } from "@/components/public/SelecaoProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(obterUrlSite() || "http://localhost:3000"),
@@ -15,7 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <SelecaoProvider>{children}</SelecaoProvider>
+      </body>
     </html>
   );
 }
