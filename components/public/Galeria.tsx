@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import FotoPlaceholder from "@/components/ui/FotoPlaceholder";
 
 // Distância mínima (em pixels) de arrasto horizontal para considerar um
@@ -75,12 +76,17 @@ export default function Galeria({
   return (
     <div>
       <div className="relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={fotos[ativa]}
           alt={`${titulo} — foto ${ativa + 1}`}
           onClick={() => setLightboxAberto(true)}
           className="h-72 w-full cursor-zoom-in rounded-2xl object-cover sm:h-96"
+          width={1024}
+          height={384}
+          sizes="(min-width: 1024px) 1024px, 100vw"
+          // A foto ativa é sempre visível ao abrir a página — carregamos com
+          // prioridade (sem lazy) só ela, nunca as miniaturas da tira abaixo.
+          priority
         />
 
         {fotos.length > 1 && (
@@ -145,11 +151,14 @@ export default function Galeria({
                   : "ring-transparent opacity-80 hover:opacity-100"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={foto}
                 alt=""
                 className="h-full w-full object-cover"
+                width={80}
+                height={64}
+                sizes="80px"
+                loading="lazy"
               />
             </button>
           ))}

@@ -178,7 +178,12 @@ export async function enviarFotos(formData: FormData): Promise<ResultadoFotos> {
 
     const { error: erroUpload } = await supabase.storage
       .from("imoveis")
-      .upload(caminho, arquivo, { contentType: arquivo.type });
+      .upload(caminho, arquivo, {
+        contentType: arquivo.type,
+        // Fotos de imóveis raramente mudam depois de enviadas — cache de 1
+        // ano reduz o egress do Supabase para quem já visitou o site.
+        cacheControl: "31536000",
+      });
 
     if (erroUpload) {
       return { sucesso: false, erro: erroUpload.message };
