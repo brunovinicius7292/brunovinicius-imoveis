@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import FotoPlaceholder from "@/components/ui/FotoPlaceholder";
 
 // Distância mínima (em pixels) de arrasto horizontal para considerar um
@@ -69,6 +68,21 @@ export default function Galeria({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lightboxAberto, fotos.length]);
 
+  // Pré-carrega só as fotos adjacentes (anterior/próxima) à ativa, sem
+  // renderizar nada na tela — assim trocar de foto no carrossel é instantâneo
+  // sem precisar baixar as demais fotos do imóvel de uma vez.
+  useEffect(() => {
+    if (fotos.length <= 1) return;
+
+    const proxima = fotos[(ativa + 1) % fotos.length];
+    const anterior = fotos[(ativa - 1 + fotos.length) % fotos.length];
+
+    [proxima, anterior].forEach((url) => {
+      const preload = new window.Image();
+      preload.src = url;
+    });
+  }, [ativa, fotos]);
+
   if (fotos.length === 0) {
     return <FotoPlaceholder className="h-72 w-full rounded-2xl sm:h-96" />;
   }
@@ -76,17 +90,12 @@ export default function Galeria({
   return (
     <div>
       <div className="relative">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={fotos[ativa]}
           alt={`${titulo} — foto ${ativa + 1}`}
           onClick={() => setLightboxAberto(true)}
           className="h-72 w-full cursor-zoom-in rounded-2xl object-cover sm:h-96"
-          width={1024}
-          height={384}
-          sizes="(min-width: 1024px) 1024px, 100vw"
-          // A foto ativa é sempre visível ao abrir a página — carregamos com
-          // prioridade (sem lazy) só ela, nunca as miniaturas da tira abaixo.
-          priority
         />
 
         {fotos.length > 1 && (
@@ -151,13 +160,11 @@ export default function Galeria({
                   : "ring-transparent opacity-80 hover:opacity-100"
               }`}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={foto}
                 alt=""
                 className="h-full w-full object-cover"
-                width={80}
-                height={64}
-                sizes="80px"
                 loading="lazy"
               />
             </button>
