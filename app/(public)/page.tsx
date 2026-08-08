@@ -22,6 +22,10 @@ const DESCRICAO_HOME =
 export const metadata: Metadata = {
   title: TITULO_HOME,
   description: DESCRICAO_HOME,
+  // Mantém a página indexável (SEO), mas pede pro Google não rastrear/indexar
+  // as fotos dos imóveis — reduz o consumo de banda do Supabase sem afetar o
+  // ranqueamento das páginas em si.
+  robots: { index: true, follow: true, noimageindex: true },
   openGraph: {
     title: TITULO_HOME,
     description: DESCRICAO_HOME,

@@ -40,6 +40,10 @@ export async function generateMetadata({
   return {
     title: imovel.titulo,
     description: descricao,
+    // Mantém a página indexável (SEO), mas pede pro Google não rastrear/indexar
+    // as fotos do imóvel — reduz o consumo de banda do Supabase sem afetar o
+    // ranqueamento das páginas em si.
+    robots: { index: true, follow: true, noimageindex: true },
     openGraph: {
       title: imovel.titulo,
       description: descricao,

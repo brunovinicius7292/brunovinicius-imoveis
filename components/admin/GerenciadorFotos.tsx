@@ -1,12 +1,35 @@
 "use client";
 
 import { useRef, useState } from "react";
+import imageCompression from "browser-image-compression";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { enviarFotos, excluirFoto } from "@/app/(admin)/admin/imoveis/actions";
 
 interface FotoItem {
   id: string;
   url: string; // caminho salvo no banco — não é a URL pública
+}
+
+// Comprime no navegador antes de enviar — reduz o egress do Supabase (o
+// mesmo arquivo é baixado muitas vezes por visitantes diferentes) sem perda
+// perceptível de qualidade. 1600px já cobre o carrossel e o zoom em tela
+// cheia; a lib trata a orientação EXIF automaticamente, então fotos de
+// celular não saem giradas.
+const OPCOES_COMPRESSAO = {
+  maxWidthOrHeight: 1600,
+  initialQuality: 0.8,
+  useWebWorker: true,
+};
+
+// Se a compressão falhar por algum motivo (formato inesperado, navegador sem
+// suporte etc.), envia o arquivo original em vez de bloquear o upload.
+async function comprimirSePossivel(arquivo: File): Promise<File> {
+  try {
+    return await imageCompression(arquivo, OPCOES_COMPRESSAO);
+  } catch (excecao) {
+    console.error("Falha ao comprimir foto, enviando original:", excecao);
+    return arquivo;
+  }
 }
 
 export default function GerenciadorFotos({
@@ -57,9 +80,11 @@ export default function GerenciadorFotos({
     for (const arquivo of listaArquivos) {
       setProgresso({ atual: enviadas + 1, total: listaArquivos.length });
 
+      const arquivoComprimido = await comprimirSePossivel(arquivo);
+
       const formData = new FormData();
       formData.set("imovelId", imovelId);
-      formData.append("fotos", arquivo);
+      formData.append("fotos", arquivoComprimido, arquivo.name);
 
       try {
         const resultado = await enviarFotos(formData);
