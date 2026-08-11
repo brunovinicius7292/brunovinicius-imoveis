@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import LinkMinhaSelecao from "@/components/public/LinkMinhaSelecao";
+import MenuMobile from "@/components/public/MenuMobile";
 
 export default function Header() {
   return (
-    <header className="bg-navy-800 text-white">
+    <header className="relative bg-navy-800 text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         {/*
           O arquivo original tem bastante espaço transparente ao redor da
@@ -36,6 +37,8 @@ export default function Header() {
           </Link>
           <LinkMinhaSelecao />
         </nav>
+
+        <MenuMobile />
       </div>
     </header>
   );
