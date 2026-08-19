@@ -1,4 +1,4 @@
-// File: C:\Users\Bruno Oliveira\Downloads\site\imoveis-app\app\(public)\page.tsx
+// File: C:\Users\Bruno Oliveira\Documents\brunovinicius-imoveis\app\(public)\page.tsx
 import * as entry from '../../../../app/(public)/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

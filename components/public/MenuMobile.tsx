@@ -65,6 +65,13 @@ export default function MenuMobile() {
             <div onClick={fechar}>
               <LinkMinhaSelecao className={CLASSE_ITEM} />
             </div>
+            <Link
+              href="/login"
+              onClick={fechar}
+              className={`${CLASSE_ITEM} mt-1 border-t border-white/10 pt-3 text-gold-300`}
+            >
+              Área do Corretor
+            </Link>
           </nav>
         </div>
       )}

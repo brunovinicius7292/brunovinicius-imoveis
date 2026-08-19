@@ -42,11 +42,15 @@ export default function LoginPage() {
             Bruno Vinícius Imóveis
           </p>
           <p className="mt-1 font-body text-sm text-navy-400">
-            Painel administrativo
+            Área do Corretor
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          autoComplete="on"
+          className="flex flex-col gap-4"
+        >
           <div>
             <label
               htmlFor="email"
@@ -56,8 +60,9 @@ export default function LoginPage() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
-              autoComplete="email"
+              autoComplete="username"
               required
               value={email}
               onChange={(evento) => setEmail(evento.target.value)}
@@ -74,6 +79,7 @@ export default function LoginPage() {
             </label>
             <input
               id="senha"
+              name="password"
               type="password"
               autoComplete="current-password"
               required
