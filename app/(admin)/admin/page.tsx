@@ -18,7 +18,8 @@ export default function AdminDashboardPage() {
         />
         <CartaoBoasVindas
           titulo="Clientes"
-          descricao="Em breve você poderá acompanhar seus clientes por aqui."
+          descricao="Cadastre e acompanhe os clientes com chance real de negócio."
+          href="/admin/clientes"
         />
         <CartaoBoasVindas
           titulo="Visitas"
