@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
+import { valorParaFinalidade } from "@/lib/utils/preco";
 
 type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -77,6 +78,30 @@ function aplicarOrdenacao(query: any, ordenarPor?: string) {
     default:
       return query.order("criado_em", { ascending: false });
   }
+}
+
+// Reordena por preço dentro de uma seção com finalidade definida (Aluguel ou
+// Venda). Necessário porque a ordenação feita no banco usa sempre a coluna
+// `preco`, que para imóveis "venda_aluguel" é o valor de venda — errado para
+// a seção de Aluguel, que precisa comparar pelo valor do aluguel
+// (`precoAluguel`). Usa a mesma regra de `valorParaFinalidade` do painel
+// admin, então o resultado bate com o que o corretor vê lá.
+export function ordenarPorContexto(
+  imoveis: Imovel[],
+  ordenarPor: string | undefined,
+  contexto: "venda" | "aluguel"
+): Imovel[] {
+  if (ordenarPor !== "menor-preco" && ordenarPor !== "maior-preco") {
+    return imoveis;
+  }
+
+  const sinal = ordenarPor === "menor-preco" ? 1 : -1;
+
+  return [...imoveis].sort((a, b) => {
+    const valorA = valorParaFinalidade(a, contexto) ?? Infinity;
+    const valorB = valorParaFinalidade(b, contexto) ?? Infinity;
+    return (valorA - valorB) * sinal;
+  });
 }
 
 // Converte o caminho salvo no banco (Storage) na URL pública do arquivo.

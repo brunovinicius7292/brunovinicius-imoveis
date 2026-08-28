@@ -12,6 +12,7 @@ import {
   getCidadesDisponiveis,
   getImoveisDestaque,
   getImoveisPublicados,
+  ordenarPorContexto,
 } from "@/lib/supabase/imoveis";
 import { obterUrlSite } from "@/lib/utils/site";
 
@@ -89,13 +90,26 @@ export default async function Home({
   // aparecem normalmente em Aluguel/Venda — sem exclusão entre as seções.
   // Imóveis "venda_aluguel" aparecem nas duas seções, pois atendem às duas
   // finalidades ao mesmo tempo.
-  const imoveisAluguel = imoveisPublicados.filter(
-    (imovel) =>
-      imovel.finalidade === "aluguel" || imovel.finalidade === "venda_aluguel"
+  //
+  // A ordenação por preço vinda do banco usa sempre a coluna `preco` — certa
+  // para a seção de Venda, mas errada para a de Aluguel quando o imóvel é
+  // "venda_aluguel" (nesse caso o valor do aluguel fica em `precoAluguel`).
+  // Por isso cada seção é reordenada aqui com o preço relevante pra ela.
+  const imoveisAluguel = ordenarPorContexto(
+    imoveisPublicados.filter(
+      (imovel) =>
+        imovel.finalidade === "aluguel" || imovel.finalidade === "venda_aluguel"
+    ),
+    filtros.ordenarPor,
+    "aluguel"
   );
-  const imoveisVenda = imoveisPublicados.filter(
-    (imovel) =>
-      imovel.finalidade === "venda" || imovel.finalidade === "venda_aluguel"
+  const imoveisVenda = ordenarPorContexto(
+    imoveisPublicados.filter(
+      (imovel) =>
+        imovel.finalidade === "venda" || imovel.finalidade === "venda_aluguel"
+    ),
+    filtros.ordenarPor,
+    "venda"
   );
 
   const totalEncontrados = imoveisPublicados.length;
