@@ -120,6 +120,65 @@ export async function atualizarImovel(
   return { sucesso: true };
 }
 
+// Duplica um imóvel existente para servir de ponto de partida de um anúncio
+// parecido — copia todos os campos do original (inclusive os que não passam
+// pelo formulário, como condomínio/IPTU/endereço), exceto:
+//   - id/criado_em/atualizado_em: gerados de novo pelo banco.
+//   - titulo: recebe o sufixo " (cópia)".
+//   - codigo: fica em branco, pra não repetir o código do original.
+//   - publicado: sempre começa como rascunho (false), mesmo se o original
+//     estivesse publicado.
+//   - slug: gerado de novo a partir do título com sufixo.
+// As fotos (`imovel_fotos`) não são copiadas — a duplicata começa sem fotos.
+export async function duplicarImovel(id: string): Promise<ResultadoAcaoImovel> {
+  const supabase = createSupabaseServerClient();
+
+  const { data: original, error: erroBusca } = await supabase
+    .from("imoveis")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (erroBusca) {
+    return { sucesso: false, erro: erroBusca.message };
+  }
+  if (!original) {
+    return { sucesso: false, erro: "Imóvel não encontrado." };
+  }
+
+  const {
+    id: _id,
+    criado_em: _criadoEm,
+    atualizado_em: _atualizadoEm,
+    slug: _slug,
+    codigo: _codigo,
+    publicado: _publicado,
+    titulo,
+    ...restante
+  } = original;
+
+  const tituloCopia = `${titulo} (cópia)`;
+
+  const { data, error } = await supabase
+    .from("imoveis")
+    .insert({
+      ...restante,
+      titulo: tituloCopia,
+      codigo: null,
+      publicado: false,
+      slug: gerarSlug(tituloCopia, ""),
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return { sucesso: false, erro: error.message };
+  }
+
+  revalidatePath("/admin/imoveis");
+  return { sucesso: true, id: data.id };
+}
+
 export async function excluirImovel(id: string): Promise<ResultadoAcaoImovel> {
   const supabase = createSupabaseServerClient();
 

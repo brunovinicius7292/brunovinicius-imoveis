@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Imovel } from "@/lib/types/imovel";
-import { excluirImovel } from "@/app/(admin)/admin/imoveis/actions";
+import { duplicarImovel, excluirImovel } from "@/app/(admin)/admin/imoveis/actions";
 import { formatarMoeda, ROTULOS_FINALIDADE } from "@/lib/utils/preco";
 
 const CLASSES_FINALIDADE: Record<string, string> = {
@@ -28,6 +28,7 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [idExcluindo, setIdExcluindo] = useState<string | null>(null);
+  const [idDuplicando, setIdDuplicando] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [ordemValor, setOrdemValor] = useState<OrdemValor>("asc");
 
@@ -61,6 +62,22 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
     startTransition(() => {
       router.refresh();
     });
+  }
+
+  async function handleDuplicar(imovel: Imovel) {
+    setErro(null);
+    setIdDuplicando(imovel.id);
+
+    const resultado = await duplicarImovel(imovel.id);
+
+    setIdDuplicando(null);
+
+    if (!resultado.sucesso || !resultado.id) {
+      setErro(resultado.erro ?? "Não foi possível duplicar o imóvel.");
+      return;
+    }
+
+    router.push(`/admin/imoveis/${resultado.id}/editar`);
   }
 
   if (imoveis.length === 0) {
@@ -164,6 +181,14 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
                   >
                     Editar
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleDuplicar(imovel)}
+                    disabled={idDuplicando === imovel.id}
+                    className="font-medium text-navy-700 hover:text-gold-600 disabled:opacity-50"
+                  >
+                    {idDuplicando === imovel.id ? "Duplicando..." : "Duplicar"}
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleExcluir(imovel)}
