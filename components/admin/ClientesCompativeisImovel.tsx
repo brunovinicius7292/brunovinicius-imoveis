@@ -10,7 +10,7 @@ import { formatarWhatsapp, linkWhatsapp } from "@/lib/utils/whatsapp";
 import { obterUrlImovel } from "@/lib/utils/site";
 import FotoCardRadar from "@/components/admin/FotoCardRadar";
 import BotaoCompartilhar from "@/components/public/BotaoCompartilhar";
-import { definirEstadoImovelCliente } from "@/app/(admin)/admin/clientes/compatibilidade-actions";
+import { ofertarNoWhatsapp } from "@/app/(admin)/admin/clientes/compatibilidade-actions";
 
 const CLASSES_CLASSIFICACAO: Record<string, string> = {
   alta: "bg-green-100 text-green-700",
@@ -47,7 +47,7 @@ export default function ClientesCompativeisImovel({
     setErro(null);
     setCarregandoAcao(clienteId);
 
-    const resultado = await definirEstadoImovelCliente(clienteId, imovel.id, "enviado");
+    const resultado = await ofertarNoWhatsapp(clienteId, imovel.id);
 
     setCarregandoAcao(null);
 
@@ -90,7 +90,7 @@ export default function ClientesCompativeisImovel({
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <Link
-                      href={`/admin/clientes/${cliente.id}/editar`}
+                      href={`/admin/clientes/${cliente.id}`}
                       className="font-body text-sm font-semibold text-navy-900 hover:text-gold-600"
                     >
                       {cliente.nome}

@@ -190,9 +190,9 @@ export default function ClienteForm({
     setSucesso(true);
     setTimeout(() => {
       if (modo === "criar" && resultado.id) {
-        // Redireciona pra edição pra que as sugestões do radar de
-        // compatibilidade já apareçam imediatamente.
-        router.push(`/admin/clientes/${resultado.id}/editar`);
+        // Redireciona pro perfil (área comercial) pra que as sugestões do
+        // radar de compatibilidade já apareçam imediatamente.
+        router.push(`/admin/clientes/${resultado.id}`);
       } else {
         router.push("/admin/clientes");
       }

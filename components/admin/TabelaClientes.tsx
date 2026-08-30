@@ -5,41 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Cliente } from "@/lib/types/cliente";
 import { excluirCliente } from "@/app/(admin)/admin/clientes/actions";
-import { formatarMoeda } from "@/lib/utils/preco";
 import { formatarWhatsapp, linkWhatsapp } from "@/lib/utils/whatsapp";
-
-const CLASSES_TEMPERATURA: Record<string, string> = {
-  quente: "bg-red-100 text-red-700",
-  morno: "bg-amber-100 text-amber-700",
-  frio: "bg-blue-100 text-blue-700",
-};
-
-const ROTULOS_TEMPERATURA: Record<string, string> = {
-  quente: "Quente",
-  morno: "Morno",
-  frio: "Frio",
-};
-
-const ROTULOS_PAGAMENTO: Record<string, string> = {
-  a_vista: "À vista",
-  financiado: "Financiado",
-  indefinido: "Indefinido",
-};
-
-function formatarFaixaValor(cliente: Cliente) {
-  if (cliente.valorMin != null && cliente.valorMax != null) {
-    return `${formatarMoeda(cliente.valorMin)} – ${formatarMoeda(
-      cliente.valorMax
-    )}`;
-  }
-  if (cliente.valorMin != null) {
-    return `A partir de ${formatarMoeda(cliente.valorMin)}`;
-  }
-  if (cliente.valorMax != null) {
-    return `Até ${formatarMoeda(cliente.valorMax)}`;
-  }
-  return "—";
-}
+import {
+  CLASSES_TEMPERATURA,
+  ROTULOS_TEMPERATURA,
+  ROTULOS_PAGAMENTO,
+  formatarFaixaValor,
+} from "@/lib/utils/cliente";
 
 export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
   const router = useRouter();
@@ -105,11 +77,21 @@ export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
         </thead>
         <tbody className="divide-y divide-navy-900/5">
           {clientes.map((cliente) => (
-            <tr key={cliente.id}>
+            <tr
+              key={cliente.id}
+              onClick={() => router.push(`/admin/clientes/${cliente.id}`)}
+              className="cursor-pointer transition hover:bg-navy-50/60"
+            >
               <td className="px-4 py-3 font-medium text-navy-900">
-                {cliente.nome}
+                <Link
+                  href={`/admin/clientes/${cliente.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="hover:text-gold-600 hover:underline"
+                >
+                  {cliente.nome}
+                </Link>
               </td>
-              <td className="px-4 py-3 text-navy-600">
+              <td className="px-4 py-3 text-navy-600" onClick={(e) => e.stopPropagation()}>
                 <a
                   href={linkWhatsapp(cliente.whatsapp)}
                   target="_blank"
@@ -142,7 +124,7 @@ export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
                     cliente.temperatura}
                 </span>
               </td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center gap-3">
                   <Link
                     href={`/admin/clientes/${cliente.id}/editar`}

@@ -147,6 +147,11 @@ export async function getClientesCompativeis(imovel: Imovel): Promise<ClienteCom
 export interface ResultadoAcaoRelacao {
   sucesso: boolean;
   erro?: string;
+  // Estado do par antes desta chamada (null se o par ainda não existia) —
+  // usada pelas server actions em compatibilidade-actions.ts pra decidir
+  // qual atividade registrar no histórico (ex.: só é "reexibido" se o
+  // estado anterior era "oculto"), sem precisar de uma consulta extra.
+  estadoAnterior?: EstadoRelacao | null;
 }
 
 // Cria ou atualiza o par cliente/imóvel com o estado informado — usada tanto
@@ -163,7 +168,7 @@ export async function definirRelacaoClienteImovel(
 
   const { data: existente, error: erroBusca } = await supabase
     .from("cliente_imoveis")
-    .select("id, origem")
+    .select("id, origem, estado")
     .eq("cliente_id", clienteId)
     .eq("imovel_id", imovelId)
     .maybeSingle();
@@ -171,6 +176,8 @@ export async function definirRelacaoClienteImovel(
   if (erroBusca) {
     return { sucesso: false, erro: erroBusca.message };
   }
+
+  const estadoAnterior = (existente?.estado as EstadoRelacao | undefined) ?? null;
 
   if (existente) {
     const { error } = await supabase
@@ -185,7 +192,7 @@ export async function definirRelacaoClienteImovel(
       .eq("id", existente.id);
 
     if (error) return { sucesso: false, erro: error.message };
-    return { sucesso: true };
+    return { sucesso: true, estadoAnterior };
   }
 
   const { error } = await supabase
@@ -193,5 +200,5 @@ export async function definirRelacaoClienteImovel(
     .insert({ cliente_id: clienteId, imovel_id: imovelId, origem, estado });
 
   if (error) return { sucesso: false, erro: error.message };
-  return { sucesso: true };
+  return { sucesso: true, estadoAnterior };
 }

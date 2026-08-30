@@ -15,6 +15,7 @@ import BotaoCompartilhar from "@/components/public/BotaoCompartilhar";
 import {
   adicionarImovelManualmente,
   definirEstadoImovelCliente,
+  ofertarNoWhatsapp,
 } from "@/app/(admin)/admin/clientes/compatibilidade-actions";
 
 const CLASSES_CLASSIFICACAO: Record<string, string> = {
@@ -68,6 +69,22 @@ export default function ImoveisCompativeisCliente({
 
     if (!resultado.sucesso) {
       setErro(resultado.erro ?? "Não foi possível atualizar o imóvel.");
+      return;
+    }
+
+    router.refresh();
+  }
+
+  async function handleOfertar(imovelId: string) {
+    setErro(null);
+    setCarregandoAcao(imovelId);
+
+    const resultado = await ofertarNoWhatsapp(cliente.id, imovelId);
+
+    setCarregandoAcao(null);
+
+    if (!resultado.sucesso) {
+      setErro(resultado.erro ?? "Não foi possível registrar a oferta.");
       return;
     }
 
@@ -150,7 +167,7 @@ export default function ImoveisCompativeisCliente({
               href={linkWhatsapp(cliente.whatsapp, mensagemOferta)}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => aplicarEstado(imovel.id, "enviado")}
+              onClick={() => handleOfertar(imovel.id)}
               className={`${CLASSES_BOTAO_CARD} border-[#25D366] bg-[#25D366]/10 text-green-700 hover:bg-[#25D366]/20`}
             >
               Ofertar no WhatsApp
