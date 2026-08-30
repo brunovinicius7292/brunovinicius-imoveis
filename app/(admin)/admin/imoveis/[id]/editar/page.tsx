@@ -56,12 +56,12 @@ export default async function EditarImovelPage({
           Clientes compatíveis
         </h2>
         <p className="mt-1 font-body text-sm text-navy-500">
-          Clientes cadastrados cujo perfil bate com este imóvel. As ações
-          (favoritar, marcar como enviado, ocultar) ficam na edição de cada
-          cliente.
+          Clientes cadastrados cujo perfil bate com este imóvel. Favoritar,
+          marcar como enviado (fora da oferta por WhatsApp) e ocultar ficam
+          na edição de cada cliente.
         </p>
         <div className="mt-4">
-          <ClientesCompativeisImovel clientes={clientesCompativeis} />
+          <ClientesCompativeisImovel imovel={imovel} clientes={clientesCompativeis} />
         </div>
       </div>
     </div>

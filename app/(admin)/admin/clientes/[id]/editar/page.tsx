@@ -66,7 +66,7 @@ export default async function EditarClientePage({
         </p>
         <div className="mt-4">
           <ImoveisCompativeisCliente
-            clienteId={cliente.id}
+            cliente={{ id: cliente.id, nome: cliente.nome, whatsapp: cliente.whatsapp }}
             sugeridos={radar.sugeridos}
             manuais={radar.manuais}
             ocultos={radar.ocultos}

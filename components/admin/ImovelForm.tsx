@@ -42,8 +42,12 @@ export default function ImovelForm({
   );
   const [vagas, setVagas] = useState(imovel?.vagas?.toString() ?? "0");
   const [areaM2, setAreaM2] = useState(imovel?.areaM2?.toString() ?? "");
-  const [aceitaFinanciamento, setAceitaFinanciamento] = useState(
-    imovel?.aceitaFinanciamento ?? false
+  // O checkbox pergunta o oposto do campo salvo: por padrão todo imóvel é
+  // considerado como aceitando financiamento (aceitaFinanciamento = true), e
+  // o corretor só marca a caixa quando o imóvel NÃO aceita. Um imóvel novo
+  // (sem `imovel`) começa desmarcado, ou seja, aceitando financiamento.
+  const [naoAceitaFinanciamento, setNaoAceitaFinanciamento] = useState(
+    imovel ? !imovel.aceitaFinanciamento : false
   );
   const [destaque, setDestaque] = useState(imovel?.destaque ?? false);
   const [publicado, setPublicado] = useState(imovel?.publicado ?? false);
@@ -83,7 +87,7 @@ export default function ImovelForm({
       banheiros: Number(banheiros) || 0,
       vagas: Number(vagas) || 0,
       areaM2: Number(areaM2) || 0,
-      aceitaFinanciamento,
+      aceitaFinanciamento: !naoAceitaFinanciamento,
       destaque,
       publicado,
       videoYoutubeUrl,
@@ -333,11 +337,11 @@ export default function ImovelForm({
           <label className="flex items-center gap-2 font-body text-sm text-navy-700">
             <input
               type="checkbox"
-              checked={aceitaFinanciamento}
-              onChange={(e) => setAceitaFinanciamento(e.target.checked)}
+              checked={naoAceitaFinanciamento}
+              onChange={(e) => setNaoAceitaFinanciamento(e.target.checked)}
               className="h-4 w-4 rounded border-navy-300 text-gold-500 focus:ring-gold-400"
             />
-            Aceita financiamento
+            Não aceita financiamento
           </label>
           <label className="flex items-center gap-2 font-body text-sm text-navy-700">
             <input

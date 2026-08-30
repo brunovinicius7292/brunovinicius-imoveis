@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 import { valorParaFinalidade } from "@/lib/utils/preco";
+import { obterUrlPublicaFoto } from "@/lib/supabase/storage";
 
 type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -102,11 +103,6 @@ export function ordenarPorContexto(
     const valorB = valorParaFinalidade(b, contexto) ?? Infinity;
     return (valorA - valorB) * sinal;
   });
-}
-
-// Converte o caminho salvo no banco (Storage) na URL pública do arquivo.
-function obterUrlPublicaFoto(supabase: ClienteSupabase, caminho: string) {
-  return supabase.storage.from("imoveis").getPublicUrl(caminho).data.publicUrl;
 }
 
 // Converte uma linha da tabela `imoveis` (snake_case), já com as fotos

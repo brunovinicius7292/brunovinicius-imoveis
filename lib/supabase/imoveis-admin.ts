@@ -1,8 +1,18 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
+import { obterUrlPublicaFoto } from "@/lib/supabase/storage";
 
-function mapRowParaImovelAdmin(row: any): Imovel {
+type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
+
+// Mesma lógica de capa usada no site público (lib/supabase/imoveis.ts): a
+// foto com a menor `ordem` é a capa. Precisa da linha com `imovel_fotos`
+// incluído na consulta (ver `select` abaixo).
+function mapRowParaImovelAdmin(row: any, supabase: ClienteSupabase): Imovel {
+  const fotos = (row.imovel_fotos ?? []) as { url: string; ordem: number }[];
+  const capa =
+    fotos.length > 0 ? [...fotos].sort((a, b) => a.ordem - b.ordem)[0] : null;
+
   return {
     id: row.id,
     codigo: row.codigo ?? undefined,
@@ -19,7 +29,7 @@ function mapRowParaImovelAdmin(row: any): Imovel {
     banheiros: row.banheiros,
     vagas: row.vagas,
     areaM2: Number(row.area_m2),
-    fotoCapaUrl: "",
+    fotoCapaUrl: capa ? obterUrlPublicaFoto(supabase, capa.url) : "",
     videoYoutubeUrl: row.video_youtube_url ?? undefined,
     destaque: row.destaque,
     publicado: row.publicado,
@@ -35,7 +45,7 @@ export async function getImoveisAdmin(): Promise<Imovel[]> {
 
   const { data, error } = await supabase
     .from("imoveis")
-    .select("*")
+    .select("*, imovel_fotos(url, ordem)")
     .order("criado_em", { ascending: false });
 
   if (error) {
@@ -43,7 +53,7 @@ export async function getImoveisAdmin(): Promise<Imovel[]> {
     return [];
   }
 
-  return (data ?? []).map(mapRowParaImovelAdmin);
+  return (data ?? []).map((row: any) => mapRowParaImovelAdmin(row, supabase));
 }
 
 // Um imóvel pelo id, para a tela de edição do painel.
@@ -52,7 +62,7 @@ export async function getImovelPorId(id: string): Promise<Imovel | null> {
 
   const { data, error } = await supabase
     .from("imoveis")
-    .select("*")
+    .select("*, imovel_fotos(url, ordem)")
     .eq("id", id)
     .maybeSingle();
 
@@ -61,7 +71,7 @@ export async function getImovelPorId(id: string): Promise<Imovel | null> {
     return null;
   }
 
-  return data ? mapRowParaImovelAdmin(data) : null;
+  return data ? mapRowParaImovelAdmin(data, supabase) : null;
 }
 
 export interface FotoImovel {

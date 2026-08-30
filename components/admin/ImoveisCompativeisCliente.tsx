@@ -5,9 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatarMoeda } from "@/lib/utils/preco";
 import { capitalizarPalavras } from "@/lib/utils/texto";
+import { linkWhatsapp } from "@/lib/utils/whatsapp";
+import { obterUrlImovel } from "@/lib/utils/site";
 import { ROTULOS_CLASSIFICACAO } from "@/lib/matching/compatibilidade";
 import { EstadoRelacao } from "@/lib/types/compatibilidade";
 import { ImovelComRelacao } from "@/lib/supabase/compatibilidade-admin";
+import FotoCardRadar from "@/components/admin/FotoCardRadar";
+import BotaoCompartilhar from "@/components/public/BotaoCompartilhar";
 import {
   adicionarImovelManualmente,
   definirEstadoImovelCliente,
@@ -19,6 +23,9 @@ const CLASSES_CLASSIFICACAO: Record<string, string> = {
   baixa: "bg-navy-100 text-navy-500",
 };
 
+const CLASSES_BOTAO_CARD =
+  "rounded-lg border px-3 py-1.5 font-body text-xs font-semibold transition disabled:opacity-50";
+
 interface OpcaoImovel {
   id: string;
   titulo: string;
@@ -26,14 +33,20 @@ interface OpcaoImovel {
   cidade: string;
 }
 
+interface ClienteResumo {
+  id: string;
+  nome: string;
+  whatsapp: string;
+}
+
 export default function ImoveisCompativeisCliente({
-  clienteId,
+  cliente,
   sugeridos,
   manuais,
   ocultos,
   opcoesParaAdicionar,
 }: {
-  clienteId: string;
+  cliente: ClienteResumo;
   sugeridos: ImovelComRelacao[];
   manuais: ImovelComRelacao[];
   ocultos: ImovelComRelacao[];
@@ -49,7 +62,7 @@ export default function ImoveisCompativeisCliente({
     setErro(null);
     setCarregandoAcao(imovelId);
 
-    const resultado = await definirEstadoImovelCliente(clienteId, imovelId, estado);
+    const resultado = await definirEstadoImovelCliente(cliente.id, imovelId, estado);
 
     setCarregandoAcao(null);
 
@@ -67,7 +80,7 @@ export default function ImoveisCompativeisCliente({
     setErro(null);
     setCarregandoAcao(imovelParaAdicionar);
 
-    const resultado = await adicionarImovelManualmente(clienteId, imovelParaAdicionar);
+    const resultado = await adicionarImovelManualmente(cliente.id, imovelParaAdicionar);
 
     setCarregandoAcao(null);
 
@@ -89,74 +102,97 @@ export default function ImoveisCompativeisCliente({
     const carregando = carregandoAcao === imovel.id;
     const favoritado = relacao?.estado === "favorito";
     const enviado = relacao?.estado === "enviado";
+    const urlImovel = obterUrlImovel(imovel.slug);
+    const mensagemOferta = `Olá, ${cliente.nome}! Separei este imóvel que pode combinar com o que você procura: ${imovel.titulo}. Veja aqui: ${urlImovel}`;
 
     return (
-      <div className="rounded-xl border border-navy-100 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <Link
-              href={`/admin/imoveis/${imovel.id}/editar`}
-              className="font-body text-sm font-semibold text-navy-900 hover:text-gold-600"
-            >
-              {imovel.titulo}
-            </Link>
-            <p className="mt-0.5 font-body text-xs text-navy-500">
-              {imovel.bairro}, {imovel.cidade}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {relacao?.origem === "manual" && (
-              <span className="rounded-full bg-navy-50 px-2 py-1 text-xs font-medium text-navy-500">
-                Adicionado manualmente
-              </span>
-            )}
-            {resultado.compativel && (
-              <span
-                className={`rounded-full px-2 py-1 text-xs font-medium ${
-                  CLASSES_CLASSIFICACAO[resultado.classificacao]
-                }`}
+      <div className="flex gap-3 rounded-xl border border-navy-100 p-4">
+        <FotoCardRadar
+          fotoCapaUrl={imovel.fotoCapaUrl}
+          videoYoutubeUrl={imovel.videoYoutubeUrl}
+          alt={imovel.titulo}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <Link
+                href={`/admin/imoveis/${imovel.id}/editar`}
+                className="font-body text-sm font-semibold text-navy-900 hover:text-gold-600"
               >
-                {ROTULOS_CLASSIFICACAO[resultado.classificacao]}
-              </span>
-            )}
+                {imovel.titulo}
+              </Link>
+              <p className="mt-0.5 font-body text-xs text-navy-500">
+                {imovel.bairro}, {imovel.cidade}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {relacao?.origem === "manual" && (
+                <span className="rounded-full bg-navy-50 px-2 py-1 text-xs font-medium text-navy-500">
+                  Adicionado manualmente
+                </span>
+              )}
+              {resultado.compativel && (
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    CLASSES_CLASSIFICACAO[resultado.classificacao]
+                  }`}
+                >
+                  {ROTULOS_CLASSIFICACAO[resultado.classificacao]}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <p className="mt-2 font-body text-sm text-navy-600">{motivos}</p>
+          <p className="mt-2 font-body text-sm text-navy-600">{motivos}</p>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            disabled={carregando}
-            onClick={() => aplicarEstado(imovel.id, favoritado ? "sugerido" : "favorito")}
-            className={`rounded-lg border px-3 py-1.5 font-body text-xs font-semibold transition disabled:opacity-50 ${
-              favoritado
-                ? "border-gold-400 bg-gold-50 text-navy-900"
-                : "border-navy-200 text-navy-600 hover:border-navy-300"
-            }`}
-          >
-            {favoritado ? "★ Favorito" : "☆ Favoritar"}
-          </button>
-          <button
-            type="button"
-            disabled={carregando}
-            onClick={() => aplicarEstado(imovel.id, enviado ? "sugerido" : "enviado")}
-            className={`rounded-lg border px-3 py-1.5 font-body text-xs font-semibold transition disabled:opacity-50 ${
-              enviado
-                ? "border-green-400 bg-green-50 text-green-700"
-                : "border-navy-200 text-navy-600 hover:border-navy-300"
-            }`}
-          >
-            {enviado ? "Enviado ✓" : "Marcar como enviado"}
-          </button>
-          <button
-            type="button"
-            disabled={carregando}
-            onClick={() => aplicarEstado(imovel.id, "oculto")}
-            className="rounded-lg border border-navy-200 px-3 py-1.5 font-body text-xs font-semibold text-navy-500 transition hover:border-red-300 hover:text-red-600 disabled:opacity-50"
-          >
-            Ocultar para este cliente
-          </button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href={linkWhatsapp(cliente.whatsapp, mensagemOferta)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => aplicarEstado(imovel.id, "enviado")}
+              className={`${CLASSES_BOTAO_CARD} border-[#25D366] bg-[#25D366]/10 text-green-700 hover:bg-[#25D366]/20`}
+            >
+              Ofertar no WhatsApp
+            </a>
+            <BotaoCompartilhar
+              titulo={imovel.titulo}
+              url={urlImovel}
+              className={`${CLASSES_BOTAO_CARD} inline-flex items-center gap-1.5 border-navy-200 text-navy-600 hover:border-navy-300`}
+            />
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={() => aplicarEstado(imovel.id, favoritado ? "sugerido" : "favorito")}
+              className={`${CLASSES_BOTAO_CARD} ${
+                favoritado
+                  ? "border-gold-400 bg-gold-50 text-navy-900"
+                  : "border-navy-200 text-navy-600 hover:border-navy-300"
+              }`}
+            >
+              {favoritado ? "★ Favorito" : "☆ Favoritar"}
+            </button>
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={() => aplicarEstado(imovel.id, enviado ? "sugerido" : "enviado")}
+              className={`${CLASSES_BOTAO_CARD} ${
+                enviado
+                  ? "border-green-400 bg-green-50 text-green-700"
+                  : "border-navy-200 text-navy-600 hover:border-navy-300"
+              }`}
+            >
+              {enviado ? "Enviado ✓" : "Marcar como enviado"}
+            </button>
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={() => aplicarEstado(imovel.id, "oculto")}
+              className={`${CLASSES_BOTAO_CARD} border-navy-200 text-navy-500 hover:border-red-300 hover:text-red-600`}
+            >
+              Ocultar para este cliente
+            </button>
+          </div>
         </div>
       </div>
     );
