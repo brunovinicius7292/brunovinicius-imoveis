@@ -129,7 +129,7 @@ function mapRowParaImovel(row: any, supabase: ClienteSupabase): Imovel {
     precoAluguel: row.preco_aluguel != null ? Number(row.preco_aluguel) : undefined,
     condominio: row.condominio != null ? Number(row.condominio) : undefined,
     iptu: row.iptu != null ? Number(row.iptu) : undefined,
-    aceitaFinanciamento: row.aceita_financiamento,
+    aceitaFinanciamento: row.aceita_financiamento ?? false,
     aceitaFgts: row.aceita_fgts,
     cidade: row.cidade,
     bairro: row.bairro,

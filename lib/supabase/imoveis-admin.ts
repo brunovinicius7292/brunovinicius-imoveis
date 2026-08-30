@@ -12,6 +12,7 @@ function mapRowParaImovelAdmin(row: any): Imovel {
     finalidade: row.finalidade,
     preco: Number(row.preco),
     precoAluguel: row.preco_aluguel != null ? Number(row.preco_aluguel) : undefined,
+    aceitaFinanciamento: row.aceita_financiamento ?? false,
     cidade: row.cidade,
     bairro: row.bairro,
     quartos: row.quartos,

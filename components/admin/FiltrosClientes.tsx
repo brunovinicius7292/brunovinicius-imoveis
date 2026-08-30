@@ -37,7 +37,7 @@ export default function FiltrosClientes({ clientes }: { clientes: Cliente[] }) {
   const [interesseTipo, setInteresseTipo] = useState("");
 
   const tiposInteresse = useMemo(
-    () => opcoesUnicas(clientes.map((c) => c.interesseTipo)),
+    () => opcoesUnicas(clientes.flatMap((c) => c.interesseTipos)),
     [clientes]
   );
 
@@ -48,7 +48,9 @@ export default function FiltrosClientes({ clientes }: { clientes: Cliente[] }) {
         return false;
       if (
         interesseTipo &&
-        chaveNormalizada(cliente.interesseTipo ?? "") !== interesseTipo
+        !cliente.interesseTipos.some(
+          (tipo) => chaveNormalizada(tipo) === interesseTipo
+        )
       )
         return false;
       return true;

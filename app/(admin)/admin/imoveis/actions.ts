@@ -18,6 +18,7 @@ export interface ImovelFormDados {
   banheiros: number;
   vagas: number;
   areaM2: number;
+  aceitaFinanciamento: boolean;
   destaque: boolean;
   publicado: boolean;
   videoYoutubeUrl: string;
@@ -67,6 +68,7 @@ export async function criarImovel(
       banheiros: dados.banheiros,
       vagas: dados.vagas,
       area_m2: dados.areaM2,
+      aceita_financiamento: dados.aceitaFinanciamento,
       destaque: dados.destaque,
       publicado: dados.publicado,
       video_youtube_url: dados.videoYoutubeUrl || null,
@@ -105,6 +107,7 @@ export async function atualizarImovel(
       banheiros: dados.banheiros,
       vagas: dados.vagas,
       area_m2: dados.areaM2,
+      aceita_financiamento: dados.aceitaFinanciamento,
       destaque: dados.destaque,
       publicado: dados.publicado,
       video_youtube_url: dados.videoYoutubeUrl || null,

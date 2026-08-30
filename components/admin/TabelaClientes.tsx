@@ -120,7 +120,9 @@ export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
                 </a>
               </td>
               <td className="px-4 py-3 text-navy-600">
-                {cliente.interesseTipo || "—"}
+                {cliente.interesseTipos.length > 0
+                  ? cliente.interesseTipos.join(", ")
+                  : "—"}
               </td>
               <td className="px-4 py-3 text-navy-600">
                 {formatarFaixaValor(cliente)}

@@ -2,8 +2,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   Cliente,
   FinalidadeCliente,
+  FinanciamentoPreferencia,
   FormaPagamento,
+  QuartosMin,
   Temperatura,
+  VagasMin,
 } from "@/lib/types/cliente";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 
@@ -14,9 +17,13 @@ function mapRowParaCliente(row: any): Cliente {
     whatsapp: row.whatsapp,
     finalidade: (row.finalidade as FinalidadeCliente) ?? "venda",
     interesseTipo: row.interesse_tipo ?? undefined,
+    interesseTipos: (row.interesse_tipos as string[] | null) ?? [],
     valorMin: row.valor_min != null ? Number(row.valor_min) : undefined,
     valorMax: row.valor_max != null ? Number(row.valor_max) : undefined,
     formaPagamento: (row.forma_pagamento as FormaPagamento) ?? "indefinido",
+    quartosMin: (row.quartos_min as QuartosMin) ?? 0,
+    vagasMin: (row.vagas_min as VagasMin) ?? 0,
+    financiamento: (row.financiamento as FinanciamentoPreferencia) ?? "indiferente",
     temperatura: row.temperatura as Temperatura,
     observacoes: row.observacoes ?? undefined,
     criadoEm: row.criado_em,
@@ -70,16 +77,17 @@ export async function getClientePorId(id: string): Promise<Cliente | null> {
   return data ? mapRowParaCliente(data) : null;
 }
 
-// Sugestões (autocomplete) para o campo "Tipo de imóvel de interesse" do
+// Sugestões (checkboxes) para o campo "Tipos de imóvel de interesse" do
 // formulário — reaproveita tanto os tipos já usados nos imóveis cadastrados
-// quanto os já usados em outros clientes. O campo continua sendo texto
-// livre; isto é só sugestão.
+// quanto os já usados em outros clientes, para que o corretor sempre veja os
+// tipos mais comuns primeiro. O cliente ainda pode digitar um tipo novo que
+// não esteja na lista.
 export async function getSugestoesInteresse(): Promise<string[]> {
   const supabase = createSupabaseServerClient();
 
   const [imoveisResp, clientesResp] = await Promise.all([
     supabase.from("imoveis").select("tipo"),
-    supabase.from("clientes").select("interesse_tipo"),
+    supabase.from("clientes").select("interesse_tipos"),
   ]);
 
   if (imoveisResp.error) {
@@ -94,7 +102,9 @@ export async function getSugestoesInteresse(): Promise<string[]> {
 
   const valores = [
     ...(imoveisResp.data ?? []).map((linha) => linha.tipo),
-    ...(clientesResp.data ?? []).map((linha) => linha.interesse_tipo),
+    ...(clientesResp.data ?? []).flatMap(
+      (linha) => (linha.interesse_tipos as string[] | null) ?? []
+    ),
   ];
 
   const mapa = new Map<string, string>();

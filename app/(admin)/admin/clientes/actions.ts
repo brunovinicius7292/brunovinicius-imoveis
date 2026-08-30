@@ -2,16 +2,26 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { FinalidadeCliente, FormaPagamento, Temperatura } from "@/lib/types/cliente";
+import {
+  FinalidadeCliente,
+  FinanciamentoPreferencia,
+  FormaPagamento,
+  QuartosMin,
+  Temperatura,
+  VagasMin,
+} from "@/lib/types/cliente";
 
 export interface ClienteFormDados {
   nome: string;
   whatsapp: string;
   finalidade: FinalidadeCliente;
-  interesseTipo: string;
+  interesseTipos: string[];
   valorMin: number | null;
   valorMax: number | null;
   formaPagamento: FormaPagamento;
+  quartosMin: QuartosMin;
+  vagasMin: VagasMin;
+  financiamento: FinanciamentoPreferencia;
   temperatura: Temperatura;
   observacoes: string;
 }
@@ -33,10 +43,13 @@ export async function criarCliente(
       nome: dados.nome,
       whatsapp: dados.whatsapp,
       finalidade: dados.finalidade,
-      interesse_tipo: dados.interesseTipo || null,
+      interesse_tipos: dados.interesseTipos,
       valor_min: dados.valorMin,
       valor_max: dados.valorMax,
       forma_pagamento: dados.formaPagamento,
+      quartos_min: dados.quartosMin,
+      vagas_min: dados.vagasMin,
+      financiamento: dados.financiamento,
       temperatura: dados.temperatura,
       observacoes: dados.observacoes || null,
     })
@@ -63,10 +76,13 @@ export async function atualizarCliente(
       nome: dados.nome,
       whatsapp: dados.whatsapp,
       finalidade: dados.finalidade,
-      interesse_tipo: dados.interesseTipo || null,
+      interesse_tipos: dados.interesseTipos,
       valor_min: dados.valorMin,
       valor_max: dados.valorMax,
       forma_pagamento: dados.formaPagamento,
+      quartos_min: dados.quartosMin,
+      vagas_min: dados.vagasMin,
+      financiamento: dados.financiamento,
       temperatura: dados.temperatura,
       observacoes: dados.observacoes || null,
       atualizado_em: new Date().toISOString(),

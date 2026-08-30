@@ -42,6 +42,9 @@ export default function ImovelForm({
   );
   const [vagas, setVagas] = useState(imovel?.vagas?.toString() ?? "0");
   const [areaM2, setAreaM2] = useState(imovel?.areaM2?.toString() ?? "");
+  const [aceitaFinanciamento, setAceitaFinanciamento] = useState(
+    imovel?.aceitaFinanciamento ?? false
+  );
   const [destaque, setDestaque] = useState(imovel?.destaque ?? false);
   const [publicado, setPublicado] = useState(imovel?.publicado ?? false);
   const [videoYoutubeUrl, setVideoYoutubeUrl] = useState(
@@ -80,6 +83,7 @@ export default function ImovelForm({
       banheiros: Number(banheiros) || 0,
       vagas: Number(vagas) || 0,
       areaM2: Number(areaM2) || 0,
+      aceitaFinanciamento,
       destaque,
       publicado,
       videoYoutubeUrl,
@@ -326,6 +330,15 @@ export default function ImovelForm({
           Opções
         </h2>
         <div className="mt-3 flex flex-wrap gap-6">
+          <label className="flex items-center gap-2 font-body text-sm text-navy-700">
+            <input
+              type="checkbox"
+              checked={aceitaFinanciamento}
+              onChange={(e) => setAceitaFinanciamento(e.target.checked)}
+              className="h-4 w-4 rounded border-navy-300 text-gold-500 focus:ring-gold-400"
+            />
+            Aceita financiamento
+          </label>
           <label className="flex items-center gap-2 font-body text-sm text-navy-700">
             <input
               type="checkbox"
