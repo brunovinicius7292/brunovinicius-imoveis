@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import FotoPlaceholder from "@/components/ui/FotoPlaceholder";
 import { obterThumbnailYoutube } from "@/lib/utils/youtube";
 
 // Miniatura usada nos cards do Radar de compatibilidade (Imóveis
 // compatíveis / Clientes compatíveis): foto de capa real, senão a thumbnail
-// do vídeo do YouTube, senão o placeholder — mesma prioridade usada nos
-// cards do site público (components/public/ImovelCard.tsx), mas com
-// next/image em tamanho pequeno (thumbnail) e lazy loading em vez da <img>
-// em resolução cheia usada lá.
+// do vídeo do YouTube, senão o placeholder — mesma prioridade (foto > vídeo >
+// placeholder) e mesma queda maxresdefault -> hqdefault usada nos cards do
+// site público (components/public/ImovelCard.tsx / ImagemImovel.tsx). Usa
+// <img loading="lazy"> como o restante do site (a única tela que renderizava
+// mídia de imóvel com next/image era esta, e o otimizador remoto do Next era
+// o motivo de a foto cair no placeholder aqui e aparecer normalmente lá).
 export default function FotoCardRadar({
   fotoCapaUrl,
   videoYoutubeUrl,
@@ -52,7 +53,8 @@ export default function FotoCardRadar({
   }
 
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={src}
       alt={alt}
       width={64}
