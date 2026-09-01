@@ -35,7 +35,21 @@ export async function generateMetadata({
 
   const url = obterUrlImovel(imovel.slug);
   const descricao = `${imovel.bairro}, ${imovel.cidade} · ${formatarPreco(imovel)}`;
-  const imagem = imovel.fotoCapaUrl || `${obterUrlSite()}/image.png`;
+
+  // Mesma prioridade de mídia do resto do site (foto de capa > vídeo >
+  // placeholder): aqui o placeholder é o logo, para o preview do WhatsApp
+  // nunca ficar sem imagem. Ao contrário dos componentes de imagem no
+  // cliente, generateMetadata roda no servidor e o scraper busca a
+  // og:image uma única vez — não dá para detectar em runtime se o
+  // maxresdefault existe (o YouTube devolve um cinza 120x90 quando não),
+  // então usamos direto o hqdefault, sempre gerado para qualquer vídeo
+  // válido: é o equivalente server-side da queda maxresdefault -> hqdefault.
+  const thumbnailVideo = obterThumbnailYoutube(imovel.videoYoutubeUrl, "hqdefault");
+  const imagem = imovel.fotoCapaUrl
+    ? { url: imovel.fotoCapaUrl, width: 1200, height: 630 }
+    : thumbnailVideo
+      ? { url: thumbnailVideo, width: 480, height: 360 }
+      : { url: `${obterUrlSite()}/image.png`, width: 1563, height: 1563 };
 
   return {
     title: imovel.titulo,
@@ -46,13 +60,13 @@ export async function generateMetadata({
       url,
       type: "website",
       locale: "pt_BR",
-      images: [{ url: imagem, width: 1200, height: 630 }],
+      images: [imagem],
     },
     twitter: {
       card: "summary_large_image",
       title: imovel.titulo,
       description: descricao,
-      images: [imagem],
+      images: [imagem.url],
     },
   };
 }
