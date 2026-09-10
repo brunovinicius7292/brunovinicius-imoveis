@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { compartilharOuCopiarLink } from "@/lib/utils/compartilhar";
 
 const CLASSES_PADRAO =
   "flex flex-1 items-center justify-center gap-2 rounded-xl border border-navy-800 py-3 font-body text-sm font-semibold text-navy-800 transition hover:bg-navy-800 hover:text-white";
@@ -22,19 +23,12 @@ export default function BotaoCompartilhar({
 
   async function compartilhar() {
     const alvo = url ?? window.location.href;
+    const { copiado: usouClipboard } = await compartilharOuCopiarLink(titulo, alvo);
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: titulo, url: alvo });
-      } catch {
-        // usuário cancelou o compartilhamento — nada a fazer
-      }
-      return;
+    if (usouClipboard) {
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
     }
-
-    await navigator.clipboard.writeText(alvo);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
   }
 
   return (

@@ -16,6 +16,7 @@ interface SelecaoContextValor {
   estaSelecionado: (id: string) => boolean;
   alternarSelecao: (id: string) => void;
   removerDaSelecao: (id: string) => void;
+  limparSelecao: () => void;
 }
 
 const SelecaoContext = createContext<SelecaoContextValor | null>(null);
@@ -68,9 +69,23 @@ export function SelecaoProvider({ children }: { children: React.ReactNode }) {
     setSelecionados((atual) => atual.filter((valor) => valor !== id));
   }, []);
 
+  // Zera a seleção de trabalho local (localStorage), como removerDaSelecao
+  // acima — só que para todos os itens de uma vez. Não tem relação nenhuma
+  // com seleções já compartilhadas/salvas no banco (essas vivem em outro
+  // lugar, independentes desta lista local).
+  const limparSelecao = useCallback(() => {
+    setSelecionados([]);
+  }, []);
+
   const valor = useMemo<SelecaoContextValor>(
-    () => ({ selecionados, estaSelecionado, alternarSelecao, removerDaSelecao }),
-    [selecionados, estaSelecionado, alternarSelecao, removerDaSelecao]
+    () => ({
+      selecionados,
+      estaSelecionado,
+      alternarSelecao,
+      removerDaSelecao,
+      limparSelecao,
+    }),
+    [selecionados, estaSelecionado, alternarSelecao, removerDaSelecao, limparSelecao]
   );
 
   return (
