@@ -14,11 +14,12 @@ import {
   getImoveisPublicados,
   ordenarPorContexto,
 } from "@/lib/supabase/imoveis";
-import { obterUrlSite } from "@/lib/utils/site";
+import { obterImagemPadraoSite, obterUrlSite } from "@/lib/utils/site";
 
 const TITULO_HOME = "Bruno Vinícius Imóveis";
 const DESCRICAO_HOME =
   "Compra, venda e aluguel de imóveis em Itabuna e região.";
+const IMAGEM_PADRAO = obterImagemPadraoSite();
 
 export const metadata: Metadata = {
   title: TITULO_HOME,
@@ -29,15 +30,13 @@ export const metadata: Metadata = {
     url: obterUrlSite(),
     type: "website",
     locale: "pt_BR",
-    images: [
-      { url: `${obterUrlSite()}/capa-hero.png`, width: 1200, height: 630 },
-    ],
+    images: [IMAGEM_PADRAO],
   },
   twitter: {
     card: "summary_large_image",
     title: TITULO_HOME,
     description: DESCRICAO_HOME,
-    images: [`${obterUrlSite()}/capa-hero.png`],
+    images: [IMAGEM_PADRAO.url],
   },
 };
 

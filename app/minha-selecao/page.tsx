@@ -2,10 +2,33 @@ import type { Metadata } from "next";
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
 import ConteudoMinhaSelecao from "@/components/public/ConteudoMinhaSelecao";
+import { obterImagemPadraoSite, obterUrlSite } from "@/lib/utils/site";
+
+const TITULO = "Minha seleção | Bruno Vinícius Imóveis";
+const DESCRICAO = "Os imóveis que você salvou para comparar ou enviar pelo WhatsApp.";
+// A seleção mora só no localStorage de quem compartilha (ver
+// SelecaoProvider) — o servidor não sabe quais imóveis estão nela nem tem
+// como saber, então aqui não tem "foto de capa específica" pra usar: cai na
+// imagem padrão do site, igual à Home.
+const IMAGEM_PADRAO = obterImagemPadraoSite();
 
 export const metadata: Metadata = {
-  title: "Minha seleção | Bruno Vinícius Imóveis",
-  description: "Os imóveis que você salvou para comparar ou enviar pelo WhatsApp.",
+  title: TITULO,
+  description: DESCRICAO,
+  openGraph: {
+    title: TITULO,
+    description: DESCRICAO,
+    url: `${obterUrlSite()}/minha-selecao`,
+    type: "website",
+    locale: "pt_BR",
+    images: [IMAGEM_PADRAO],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO,
+    description: DESCRICAO,
+    images: [IMAGEM_PADRAO.url],
+  },
 };
 
 export default function PaginaMinhaSelecao() {
