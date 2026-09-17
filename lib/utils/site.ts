@@ -1,8 +1,14 @@
 // URL pública canônica do site, usada para montar links absolutos
 // (mensagem do WhatsApp, metadados de compartilhamento) sem depender de
 // window.location.
+//
+// Fallback fixo: se NEXT_PUBLIC_SITE_URL não estiver configurada no
+// ambiente de build (ex.: variável ausente na Vercel), sem este fallback
+// a função retorna "" e os links/og:image viram "http://localhost:3000/...",
+// que o WhatsApp/Facebook não conseguem acessar — quebrando a prévia do link.
 export function obterUrlSite(): string {
-  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const url =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.brunoviniciusimoveis.com.br";
   return url.replace(/\/+$/, "");
 }
 
