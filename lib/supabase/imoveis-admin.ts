@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Imovel } from "@/lib/types/imovel";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 import { obterUrlPublicaFoto } from "@/lib/supabase/storage";
+import { ordenarFotosPorOrdem } from "@/lib/utils/fotos";
 
 type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -10,8 +11,7 @@ type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 // incluído na consulta (ver `select` abaixo).
 function mapRowParaImovelAdmin(row: any, supabase: ClienteSupabase): Imovel {
   const fotos = (row.imovel_fotos ?? []) as { url: string; ordem: number }[];
-  const capa =
-    fotos.length > 0 ? [...fotos].sort((a, b) => a.ordem - b.ordem)[0] : null;
+  const capa = fotos.length > 0 ? ordenarFotosPorOrdem(fotos)[0] : null;
 
   return {
     id: row.id,

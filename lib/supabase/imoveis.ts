@@ -3,6 +3,7 @@ import { Imovel } from "@/lib/types/imovel";
 import { capitalizarPalavras, chaveNormalizada } from "@/lib/utils/texto";
 import { valorParaFinalidade } from "@/lib/utils/preco";
 import { obterUrlPublicaFoto } from "@/lib/supabase/storage";
+import { ordenarFotosPorOrdem } from "@/lib/utils/fotos";
 
 type ClienteSupabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -109,10 +110,7 @@ export function ordenarPorContexto(
 // relacionadas (`imovel_fotos`), para o tipo `Imovel` usado pelos componentes.
 function mapRowParaImovel(row: any, supabase: ClienteSupabase): Imovel {
   const fotos = (row.imovel_fotos ?? []) as { url: string; ordem: number }[];
-  const capa =
-    fotos.length > 0
-      ? [...fotos].sort((a, b) => a.ordem - b.ordem)[0]
-      : null;
+  const capa = fotos.length > 0 ? ordenarFotosPorOrdem(fotos)[0] : null;
 
   return {
     id: row.id,

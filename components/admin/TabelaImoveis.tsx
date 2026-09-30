@@ -77,6 +77,13 @@ export default function TabelaImoveis({ imoveis }: { imoveis: Imovel[] }) {
       return;
     }
 
+    // Aviso não bloqueante (ex.: alguma foto não pôde ser copiada) — o
+    // imóvel duplicado já existe, então avisamos e seguimos para a edição
+    // normalmente, em vez de travar o fluxo.
+    if (resultado.aviso) {
+      window.alert(resultado.aviso);
+    }
+
     router.push(`/admin/imoveis/${resultado.id}/editar`);
   }
 

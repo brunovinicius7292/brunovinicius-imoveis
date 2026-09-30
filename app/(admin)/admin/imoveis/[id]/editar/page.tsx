@@ -44,7 +44,9 @@ export default async function EditarImovelPage({
           Fotos do imóvel
         </h2>
         <p className="mt-1 font-body text-sm text-navy-500">
-          A primeira foto enviada é usada como capa do imóvel.
+          Arraste uma foto para reordenar, ou use os botões para excluir,
+          substituir ou definir a capa. A primeira foto da lista é sempre a
+          capa do imóvel.
         </p>
         <div className="mt-4">
           <GerenciadorFotos imovelId={imovel.id} fotosIniciais={fotos} />
