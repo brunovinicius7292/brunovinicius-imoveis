@@ -7,11 +7,12 @@ import {
   FinanciamentoPreferencia,
   FormaPagamento,
   MomentoComercial,
+  MotivoEncerramento,
   QuartosMin,
   Temperatura,
   VagasMin,
 } from "@/lib/types/cliente";
-import { ROTULOS_MOMENTO } from "@/lib/utils/cliente";
+import { ROTULOS_MOMENTO, ROTULOS_MOTIVO_ENCERRAMENTO } from "@/lib/utils/cliente";
 import { registrarAtividade } from "@/lib/supabase/atividades-admin";
 
 export interface ClienteFormDados {
@@ -101,18 +102,32 @@ export async function atualizarCliente(
 }
 
 // Muda a etapa comercial do cliente (Em busca / Em negociação / Negócio
-// fechado) — ação independente da edição cadastral, pensada para ser usada
-// direto na página de perfil. Registra uma atividade no histórico já
-// existente (não cria um segundo sistema de tracking).
+// fechado / Encerrado sem negócio) — ação independente da edição cadastral,
+// pensada para ser usada direto na página de perfil. Registra uma atividade
+// no histórico já existente (não cria um segundo sistema de tracking).
 export async function alterarMomentoCliente(
   id: string,
-  momento: MomentoComercial
+  momento: MomentoComercial,
+  motivoEncerramento?: MotivoEncerramento | null
 ): Promise<ResultadoAcaoCliente> {
+  if (momento === "encerrado_sem_negocio" && !motivoEncerramento) {
+    return { sucesso: false, erro: "Selecione o motivo do encerramento." };
+  }
+
+  // O motivo só faz sentido junto de "encerrado_sem_negocio" — qualquer
+  // outro momento (inclusive "fechado") limpa o motivo salvo anteriormente.
+  const motivoParaSalvar =
+    momento === "encerrado_sem_negocio" ? motivoEncerramento ?? null : null;
+
   const supabase = createSupabaseServerClient();
 
   const { error } = await supabase
     .from("clientes")
-    .update({ momento, atualizado_em: new Date().toISOString() })
+    .update({
+      momento,
+      motivo_encerramento: motivoParaSalvar,
+      atualizado_em: new Date().toISOString(),
+    })
     .eq("id", id);
 
   if (error) {
@@ -123,9 +138,12 @@ export async function alterarMomentoCliente(
   revalidatePath(`/admin/clientes/${id}`);
   revalidatePath(`/admin/clientes/${id}/editar`);
 
-  await registrarAtividade(id, "momento_alterado", {
-    descricao: `Momento alterado para "${ROTULOS_MOMENTO[momento]}"`,
-  });
+  const descricao =
+    momento === "encerrado_sem_negocio" && motivoParaSalvar
+      ? `Momento alterado para "${ROTULOS_MOMENTO[momento]}" (motivo: ${ROTULOS_MOTIVO_ENCERRAMENTO[motivoParaSalvar]})`
+      : `Momento alterado para "${ROTULOS_MOMENTO[momento]}"`;
+
+  await registrarAtividade(id, "momento_alterado", { descricao });
 
   return { sucesso: true };
 }

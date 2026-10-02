@@ -8,9 +8,22 @@ export type FormaPagamento = "a_vista" | "financiado" | "indefinido";
 export type FinalidadeCliente = "venda" | "aluguel";
 // Etapa do atendimento comercial — independente da finalidade (venda/aluguel).
 // "buscando" é o padrão para todo cliente novo; o corretor pode mudar de
-// momento a qualquer hora, inclusive voltar de "fechado"/"em_negociacao"
-// para "buscando".
-export type MomentoComercial = "buscando" | "em_negociacao" | "fechado";
+// momento a qualquer hora, inclusive voltar de "fechado"/"em_negociacao"/
+// "encerrado_sem_negocio" para "buscando".
+export type MomentoComercial =
+  | "buscando"
+  | "em_negociacao"
+  | "fechado"
+  | "encerrado_sem_negocio"; // não fechou negócio comigo, mas continua preservado no CRM
+
+// Só tem sentido (e só é salvo) quando `momento === "encerrado_sem_negocio"` —
+// ver regra de limpeza em alterarMomentoCliente.
+export type MotivoEncerramento =
+  | "fechou_com_outra"
+  | "desistiu"
+  | "sem_retorno"
+  | "sem_perfil_momento"
+  | "outro";
 
 // 0 = indiferente (sem mínimo). Os demais valores funcionam como "1+", "2+"
 // etc — um imóvel com quantidade maior continua compatível.
@@ -39,5 +52,6 @@ export interface Cliente {
   temperatura: Temperatura;
   observacoes?: string;
   momento: MomentoComercial;
+  motivoEncerramento?: MotivoEncerramento;
   criadoEm: string;
 }

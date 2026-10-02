@@ -15,6 +15,7 @@ const ABAS_MOMENTO: { valor: MomentoComercial; rotulo: string }[] = [
   { valor: "buscando", rotulo: ROTULOS_MOMENTO.buscando },
   { valor: "em_negociacao", rotulo: ROTULOS_MOMENTO.em_negociacao },
   { valor: "fechado", rotulo: ROTULOS_MOMENTO.fechado },
+  { valor: "encerrado_sem_negocio", rotulo: ROTULOS_MOMENTO.encerrado_sem_negocio },
 ];
 
 export default function AbasClientesFinalidade({
@@ -43,6 +44,9 @@ export default function AbasClientesFinalidade({
       buscando: clientesDaAba.filter((c) => c.momento === "buscando").length,
       em_negociacao: clientesDaAba.filter((c) => c.momento === "em_negociacao").length,
       fechado: clientesDaAba.filter((c) => c.momento === "fechado").length,
+      encerrado_sem_negocio: clientesDaAba.filter(
+        (c) => c.momento === "encerrado_sem_negocio"
+      ).length,
     }),
     [clientesDaAba]
   );

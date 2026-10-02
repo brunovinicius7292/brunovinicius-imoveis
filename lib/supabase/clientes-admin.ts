@@ -5,6 +5,7 @@ import {
   FinanciamentoPreferencia,
   FormaPagamento,
   MomentoComercial,
+  MotivoEncerramento,
   QuartosMin,
   Temperatura,
   VagasMin,
@@ -28,6 +29,7 @@ function mapRowParaCliente(row: any): Cliente {
     temperatura: row.temperatura as Temperatura,
     observacoes: row.observacoes ?? undefined,
     momento: (row.momento as MomentoComercial) ?? "buscando",
+    motivoEncerramento: (row.motivo_encerramento as MotivoEncerramento) ?? undefined,
     criadoEm: row.criado_em,
   };
 }

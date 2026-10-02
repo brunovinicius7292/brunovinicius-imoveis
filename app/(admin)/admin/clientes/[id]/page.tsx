@@ -15,6 +15,7 @@ import {
   ROTULOS_FINALIDADE_CLIENTE,
   CLASSES_MOMENTO,
   ROTULOS_MOMENTO,
+  ROTULOS_MOTIVO_ENCERRAMENTO,
   ROTULOS_FINANCIAMENTO,
   formatarFaixaValor,
   formatarMinimo,
@@ -166,6 +167,12 @@ export default async function PerfilClientePage({
             valor={formatarMinimo(cliente.quartosMin)}
           />
           <ItemPerfil label="Vagas (mínimo)" valor={formatarMinimo(cliente.vagasMin)} />
+          {cliente.motivoEncerramento && (
+            <ItemPerfil
+              label="Motivo do encerramento"
+              valor={ROTULOS_MOTIVO_ENCERRAMENTO[cliente.motivoEncerramento]}
+            />
+          )}
           <div className="sm:col-span-2 lg:col-span-3">
             <ItemPerfil
               label="Observações"
@@ -187,6 +194,14 @@ export default async function PerfilClientePage({
               {" "}
               Como o negócio já foi fechado, novas sugestões automáticas ficam
               pausadas — imóveis adicionados manualmente continuam aqui.
+            </>
+          )}
+          {cliente.momento === "encerrado_sem_negocio" && (
+            <>
+              {" "}
+              Como o atendimento foi encerrado sem negócio, novas sugestões
+              automáticas ficam pausadas — imóveis adicionados manualmente
+              continuam aqui.
             </>
           )}
         </p>

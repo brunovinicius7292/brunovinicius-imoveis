@@ -4,10 +4,11 @@
 //
 // Regras de negócio (não repetir/alterar sem revisar a tarefa original):
 //   - Só imóveis com status "disponivel" entram no radar.
-//   - Clientes com momento "fechado" não entram no radar automático (não
-//     recebem novas sugestões nem aparecem como "cliente compatível" na
-//     edição de um imóvel) — relações manuais anteriores são preservadas
-//     pelas telas que já tratam origem "manual" separadamente.
+//   - Clientes com momento "fechado" ou "encerrado_sem_negocio" não entram
+//     no radar automático (não recebem novas sugestões nem aparecem como
+//     "cliente compatível" na edição de um imóvel) — relações manuais
+//     anteriores são preservadas pelas telas que já tratam origem "manual"
+//     separadamente.
 //   - Finalidade precisa ser compatível (venda/aluguel), usando `preco` para
 //     venda e `preco_aluguel` para aluguel — mesma regra de
 //     lib/utils/preco.ts#valorParaFinalidade, reaproveitada aqui.
@@ -38,6 +39,13 @@ const RESULTADO_INCOMPATIVEL: ResultadoCompatibilidade = {
   motivos: [],
 };
 
+// Momentos em que o cliente não está mais procurando ativamente (negócio já
+// fechado ou atendimento encerrado sem negócio) — saem do radar automático.
+const MOMENTOS_FORA_DO_RADAR: ReadonlySet<Cliente["momento"]> = new Set([
+  "fechado",
+  "encerrado_sem_negocio",
+]);
+
 function plural(quantidade: number, singular: string, plural: string) {
   return `${quantidade} ${quantidade === 1 ? singular : plural}`;
 }
@@ -51,7 +59,7 @@ export function avaliarCompatibilidade(
   imovel: Imovel
 ): ResultadoCompatibilidade {
   if (imovel.status !== "disponivel") return RESULTADO_INCOMPATIVEL;
-  if (cliente.momento === "fechado") return RESULTADO_INCOMPATIVEL;
+  if (MOMENTOS_FORA_DO_RADAR.has(cliente.momento)) return RESULTADO_INCOMPATIVEL;
 
   const valorReferencia = valorParaFinalidade(imovel, cliente.finalidade);
   if (valorReferencia == null) return RESULTADO_INCOMPATIVEL;

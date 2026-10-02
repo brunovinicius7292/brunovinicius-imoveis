@@ -8,6 +8,7 @@ import {
   FinanciamentoPreferencia,
   FormaPagamento,
   MomentoComercial,
+  MotivoEncerramento,
   Temperatura,
 } from "@/lib/types/cliente";
 import { formatarMoeda } from "@/lib/utils/preco";
@@ -44,12 +45,22 @@ export const ROTULOS_MOMENTO: Record<MomentoComercial, string> = {
   buscando: "Em busca",
   em_negociacao: "Em negociação",
   fechado: "Negócio fechado",
+  encerrado_sem_negocio: "Encerrado sem negócio",
 };
 
 export const CLASSES_MOMENTO: Record<MomentoComercial, string> = {
   buscando: "bg-blue-100 text-blue-700",
   em_negociacao: "bg-amber-100 text-amber-700",
   fechado: "bg-green-100 text-green-700",
+  encerrado_sem_negocio: "bg-navy-100 text-navy-500",
+};
+
+export const ROTULOS_MOTIVO_ENCERRAMENTO: Record<MotivoEncerramento, string> = {
+  fechou_com_outra: "Fechou com outra imobiliária",
+  desistiu: "Desistiu da procura",
+  sem_retorno: "Sem retorno",
+  sem_perfil_momento: "Sem perfil no momento",
+  outro: "Outro",
 };
 
 export const ROTULOS_FINANCIAMENTO: Record<FinanciamentoPreferencia, string> = {
