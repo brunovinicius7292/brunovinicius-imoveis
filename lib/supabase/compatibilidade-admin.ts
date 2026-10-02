@@ -105,6 +105,7 @@ export async function getRadarDoCliente(cliente: Cliente): Promise<RadarDoClient
     .filter(
       (item) =>
         item.resultado.compativel &&
+        item.imovel.publicado === true &&
         item.relacao?.estado !== "oculto" &&
         !idsManuais.has(item.imovel.id)
     )

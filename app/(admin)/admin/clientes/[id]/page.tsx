@@ -51,7 +51,12 @@ export default async function PerfilClientePage({
     ...radar.ocultos.map((item) => item.imovel.id),
   ]);
   const opcoesParaAdicionar = todosImoveis
-    .filter((imovel) => imovel.status === "disponivel" && !idsJaListados.has(imovel.id))
+    .filter(
+      (imovel) =>
+        imovel.status === "disponivel" &&
+        imovel.publicado === true &&
+        !idsJaListados.has(imovel.id)
+    )
     .map((imovel) => ({
       id: imovel.id,
       titulo: imovel.titulo,
