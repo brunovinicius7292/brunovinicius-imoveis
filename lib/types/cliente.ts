@@ -6,6 +6,11 @@
 export type Temperatura = "frio" | "morno" | "quente";
 export type FormaPagamento = "a_vista" | "financiado" | "indefinido";
 export type FinalidadeCliente = "venda" | "aluguel";
+// Etapa do atendimento comercial — independente da finalidade (venda/aluguel).
+// "buscando" é o padrão para todo cliente novo; o corretor pode mudar de
+// momento a qualquer hora, inclusive voltar de "fechado"/"em_negociacao"
+// para "buscando".
+export type MomentoComercial = "buscando" | "em_negociacao" | "fechado";
 
 // 0 = indiferente (sem mínimo). Os demais valores funcionam como "1+", "2+"
 // etc — um imóvel com quantidade maior continua compatível.
@@ -33,5 +38,6 @@ export interface Cliente {
   financiamento: FinanciamentoPreferencia;
   temperatura: Temperatura;
   observacoes?: string;
+  momento: MomentoComercial;
   criadoEm: string;
 }

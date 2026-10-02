@@ -7,6 +7,7 @@ import {
   FinalidadeCliente,
   FinanciamentoPreferencia,
   FormaPagamento,
+  MomentoComercial,
   Temperatura,
 } from "@/lib/types/cliente";
 import { formatarMoeda } from "@/lib/utils/preco";
@@ -37,6 +38,18 @@ export const ROTULOS_FINALIDADE_CLIENTE: Record<FinalidadeCliente, string> = {
 export const CLASSES_FINALIDADE_CLIENTE: Record<FinalidadeCliente, string> = {
   venda: "bg-green-100 text-green-700",
   aluguel: "bg-blue-100 text-blue-700",
+};
+
+export const ROTULOS_MOMENTO: Record<MomentoComercial, string> = {
+  buscando: "Em busca",
+  em_negociacao: "Em negociação",
+  fechado: "Negócio fechado",
+};
+
+export const CLASSES_MOMENTO: Record<MomentoComercial, string> = {
+  buscando: "bg-blue-100 text-blue-700",
+  em_negociacao: "bg-amber-100 text-amber-700",
+  fechado: "bg-green-100 text-green-700",
 };
 
 export const ROTULOS_FINANCIAMENTO: Record<FinanciamentoPreferencia, string> = {

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ImoveisCompativeisCliente from "@/components/admin/ImoveisCompativeisCliente";
 import AtividadesCliente from "@/components/admin/AtividadesCliente";
+import AlterarMomentoCliente from "@/components/admin/AlterarMomentoCliente";
 import { getClientePorId } from "@/lib/supabase/clientes-admin";
 import { getImoveisAdmin } from "@/lib/supabase/imoveis-admin";
 import { getRadarDoCliente } from "@/lib/supabase/compatibilidade-admin";
@@ -12,6 +13,8 @@ import {
   ROTULOS_TEMPERATURA,
   CLASSES_FINALIDADE_CLIENTE,
   ROTULOS_FINALIDADE_CLIENTE,
+  CLASSES_MOMENTO,
+  ROTULOS_MOMENTO,
   ROTULOS_FINANCIAMENTO,
   formatarFaixaValor,
   formatarMinimo,
@@ -82,10 +85,21 @@ export default async function PerfilClientePage({
             >
               {ROTULOS_FINALIDADE_CLIENTE[cliente.finalidade]}
             </span>
+            <span
+              className={`rounded-full px-2 py-1 text-xs font-medium ${CLASSES_MOMENTO[cliente.momento]}`}
+            >
+              {ROTULOS_MOMENTO[cliente.momento]}
+            </span>
           </div>
           <p className="mt-1 font-body text-navy-500">
             Perfil do cliente — dados, imóveis compatíveis e histórico de atividades.
           </p>
+          <div className="mt-3">
+            <span className="mb-1 block font-body text-xs font-medium uppercase tracking-wide text-navy-400">
+              Momento comercial
+            </span>
+            <AlterarMomentoCliente clienteId={cliente.id} momento={cliente.momento} />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -168,6 +182,13 @@ export default async function PerfilClientePage({
         <p className="mt-1 font-body text-sm text-navy-500">
           Sugestões calculadas a partir do perfil do cliente — tipo, valor
           máximo, financiamento, quartos e vagas.
+          {cliente.momento === "fechado" && (
+            <>
+              {" "}
+              Como o negócio já foi fechado, novas sugestões automáticas ficam
+              pausadas — imóveis adicionados manualmente continuam aqui.
+            </>
+          )}
         </p>
         <div className="mt-4">
           <ImoveisCompativeisCliente

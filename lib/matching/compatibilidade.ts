@@ -4,6 +4,10 @@
 //
 // Regras de negócio (não repetir/alterar sem revisar a tarefa original):
 //   - Só imóveis com status "disponivel" entram no radar.
+//   - Clientes com momento "fechado" não entram no radar automático (não
+//     recebem novas sugestões nem aparecem como "cliente compatível" na
+//     edição de um imóvel) — relações manuais anteriores são preservadas
+//     pelas telas que já tratam origem "manual" separadamente.
 //   - Finalidade precisa ser compatível (venda/aluguel), usando `preco` para
 //     venda e `preco_aluguel` para aluguel — mesma regra de
 //     lib/utils/preco.ts#valorParaFinalidade, reaproveitada aqui.
@@ -47,6 +51,7 @@ export function avaliarCompatibilidade(
   imovel: Imovel
 ): ResultadoCompatibilidade {
   if (imovel.status !== "disponivel") return RESULTADO_INCOMPATIVEL;
+  if (cliente.momento === "fechado") return RESULTADO_INCOMPATIVEL;
 
   const valorReferencia = valorParaFinalidade(imovel, cliente.finalidade);
   if (valorReferencia == null) return RESULTADO_INCOMPATIVEL;

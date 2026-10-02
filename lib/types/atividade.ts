@@ -9,7 +9,8 @@ export type TipoAtividade =
   | "ocultado"
   | "reexibido" // voltou a aparecer nas sugestões depois de oculto
   | "adicionado_manual"
-  | "nota_manual"; // texto livre digitado pelo corretor na página de perfil
+  | "nota_manual" // texto livre digitado pelo corretor na página de perfil
+  | "momento_alterado"; // mudança de etapa comercial (buscando/em_negociacao/fechado)
 
 export interface AtividadeCliente {
   id: string;

@@ -6,10 +6,13 @@ import {
   FinalidadeCliente,
   FinanciamentoPreferencia,
   FormaPagamento,
+  MomentoComercial,
   QuartosMin,
   Temperatura,
   VagasMin,
 } from "@/lib/types/cliente";
+import { ROTULOS_MOMENTO } from "@/lib/utils/cliente";
+import { registrarAtividade } from "@/lib/supabase/atividades-admin";
 
 export interface ClienteFormDados {
   nome: string;
@@ -94,6 +97,36 @@ export async function atualizarCliente(
   }
 
   revalidatePath("/admin/clientes");
+  return { sucesso: true };
+}
+
+// Muda a etapa comercial do cliente (Em busca / Em negociação / Negócio
+// fechado) — ação independente da edição cadastral, pensada para ser usada
+// direto na página de perfil. Registra uma atividade no histórico já
+// existente (não cria um segundo sistema de tracking).
+export async function alterarMomentoCliente(
+  id: string,
+  momento: MomentoComercial
+): Promise<ResultadoAcaoCliente> {
+  const supabase = createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from("clientes")
+    .update({ momento, atualizado_em: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    return { sucesso: false, erro: error.message };
+  }
+
+  revalidatePath("/admin/clientes");
+  revalidatePath(`/admin/clientes/${id}`);
+  revalidatePath(`/admin/clientes/${id}/editar`);
+
+  await registrarAtividade(id, "momento_alterado", {
+    descricao: `Momento alterado para "${ROTULOS_MOMENTO[momento]}"`,
+  });
+
   return { sucesso: true };
 }
 

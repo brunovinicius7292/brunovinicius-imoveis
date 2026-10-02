@@ -15,6 +15,7 @@ const ROTULOS_TIPO: Record<TipoAtividade, string> = {
   reexibido: "Voltou a aparecer nas sugestões",
   adicionado_manual: "Adicionado manualmente",
   nota_manual: "Nota",
+  momento_alterado: "Momento comercial alterado",
 };
 
 function formatarDataHora(iso: string) {

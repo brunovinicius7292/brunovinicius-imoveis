@@ -9,6 +9,8 @@ import { formatarWhatsapp, linkWhatsapp } from "@/lib/utils/whatsapp";
 import {
   CLASSES_TEMPERATURA,
   ROTULOS_TEMPERATURA,
+  CLASSES_MOMENTO,
+  ROTULOS_MOMENTO,
   ROTULOS_PAGAMENTO,
   formatarFaixaValor,
 } from "@/lib/utils/cliente";
@@ -72,6 +74,7 @@ export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
             <th className="px-4 py-3 font-medium">Faixa de valor</th>
             <th className="px-4 py-3 font-medium">Pagamento</th>
             <th className="px-4 py-3 font-medium">Temperatura</th>
+            <th className="px-4 py-3 font-medium">Momento</th>
             <th className="px-4 py-3 font-medium">Ações</th>
           </tr>
         </thead>
@@ -122,6 +125,15 @@ export default function TabelaClientes({ clientes }: { clientes: Cliente[] }) {
                 >
                   {ROTULOS_TEMPERATURA[cliente.temperatura] ??
                     cliente.temperatura}
+                </span>
+              </td>
+              <td className="px-4 py-3">
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-medium ${
+                    CLASSES_MOMENTO[cliente.momento] ?? "bg-navy-50 text-navy-600"
+                  }`}
+                >
+                  {ROTULOS_MOMENTO[cliente.momento] ?? cliente.momento}
                 </span>
               </td>
               <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
