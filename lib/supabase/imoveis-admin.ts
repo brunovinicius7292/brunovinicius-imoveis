@@ -115,6 +115,7 @@ const TIPOS_SUGERIDOS_BASE = [
   "Galpão",
   "Sala Comercial",
   "Ponto Comercial",
+  "Lançamentos",
 ];
 
 // Deduplica ignorando maiúsculas/minúsculas e espaços, mantendo o rótulo
