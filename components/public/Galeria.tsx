@@ -247,7 +247,12 @@ export default function Galeria({
             src={fotos[ativa]}
             alt={`${titulo} — foto ${ativa + 1} em tela cheia`}
             onClick={(evento) => evento.stopPropagation()}
-            className="max-h-full max-w-full rounded-lg object-contain"
+            // No celular a imagem ocupa sempre toda a área disponível
+            // (h-full w-full + object-contain preserva a proporção, sem corte):
+            // só max-h/max-w não amplia fotos de baixa resolução, que ficavam
+            // pequenas e centralizadas. A partir de sm mantém o comportamento
+            // anterior (tamanho natural limitado à tela).
+            className="h-full w-full object-contain sm:h-auto sm:max-h-full sm:w-auto sm:max-w-full sm:rounded-lg"
           />
 
           {fotos.length > 1 && (

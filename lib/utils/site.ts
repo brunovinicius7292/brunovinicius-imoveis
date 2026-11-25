@@ -16,6 +16,15 @@ export function obterUrlImovel(slug: string): string {
   return `${obterUrlSite()}/imovel/${slug}`;
 }
 
+// URL absoluta de uma versão reduzida (1200px de largura) de uma imagem
+// remota, via otimizador do Next (hosts liberados em next.config.js). As
+// fotos originais do Storage são enviadas sem compressão e passam de vários
+// MB; o WhatsApp descarta og:image muito pesada (acima de ~600 KB) e mostra o
+// link sem foto — por isso só alguns anúncios tinham prévia.
+export function obterUrlImagemCompartilhamento(urlOriginal: string): string {
+  return `${obterUrlSite()}/_next/image?url=${encodeURIComponent(urlOriginal)}&w=1200&q=70`;
+}
+
 // og:image padrão do site (Open Graph / Twitter Card) para páginas que não
 // têm uma foto específica para mostrar — hoje a Home e "Minha seleção" (que
 // só existe no localStorage do navegador de quem compartilha, sem imóvel

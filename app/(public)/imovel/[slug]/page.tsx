@@ -15,7 +15,11 @@ import ImagemImovel from "@/components/public/ImagemImovel";
 import BotaoAssistirVideo from "@/components/public/BotaoAssistirVideo";
 import { Imovel } from "@/lib/types/imovel";
 import { formatarMoeda, ROTULOS_FINALIDADE } from "@/lib/utils/preco";
-import { obterUrlImovel, obterUrlSite } from "@/lib/utils/site";
+import {
+  obterUrlImagemCompartilhamento,
+  obterUrlImovel,
+  obterUrlSite,
+} from "@/lib/utils/site";
 
 function formatarPreco(imovel: Imovel) {
   const valor = formatarMoeda(imovel.preco);
@@ -46,7 +50,9 @@ export async function generateMetadata({
   // válido: é o equivalente server-side da queda maxresdefault -> hqdefault.
   const thumbnailVideo = obterThumbnailYoutube(imovel.videoYoutubeUrl, "hqdefault");
   const imagem = imovel.fotoCapaUrl
-    ? { url: imovel.fotoCapaUrl, width: 1200, height: 630 }
+    ? // Sem width/height: a proporção real da foto varia e declarar valores
+      // diferentes do arquivo faz alguns scrapers recortarem ou descartarem.
+      { url: obterUrlImagemCompartilhamento(imovel.fotoCapaUrl) }
     : thumbnailVideo
       ? { url: thumbnailVideo, width: 480, height: 360 }
       : { url: `${obterUrlSite()}/image.png`, width: 1563, height: 1563 };
